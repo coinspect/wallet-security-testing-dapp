@@ -40,7 +40,7 @@
 		"autoprefixer": "^10.4.20",
 		"eslint": "^9.39.5",
 		"@swc/core": "^1.16.13",
-		"@vitejs/plugin-react": "^6.1.1",
+		"@vitejs/plugin-react": "^6.1.2",
 		"vite": "^8.3.2",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^7.1.1",
