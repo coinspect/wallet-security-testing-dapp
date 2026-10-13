@@ -1,0 +1,106 @@
+name: Refresh checks.json snapshot
+
+# Re-fetches the canonical checks.json into
+# src/app/wizard/config/checks-snapshot.json and opens a PR when the upstream
+# blob changed.
+#
+# NOTE: the refresh script also VALIDATES that every wizard canonicalId still
+# exists in the fetched snapshot (scripts/refresh-checks-snapshot.mjs). If the
+# "Refresh snapshot" step fails that validation, it means a wizard step's
+# canonicalId no longer matches the canonical checks.json (usually an upstream
+# version bump, e.g. .v2 -> .v3) — update the canonicalId in
+# src/app/wizard/config/wizard.json to one of the keys the error lists.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "checks.json ref (branch, tag, or commit SHA)"
+        required: false
+        default: "main"
+      allow_canonical_drift:
+        description: "I reviewed canonical text drift against wizard.json"
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Weekly, Mondays 06:00 UTC.
+    - cron: "0 6 * * 1"
+
+permissions: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.13.0
+
+      - name: Read current blobSha
+        id: before
+        run: |
+          if [ -f src/app/wizard/config/checks-snapshot.json ]; then
+            echo "sha=$(jq -r '._provenance.blobSha' src/app/wizard/config/checks-snapshot.json)" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=(none)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Refresh snapshot (fetch + validate)
+        # Uses the built-in GITHUB_TOKEN to avoid the 60/hr anonymous rate
+        # limit. A non-zero exit here = failed validation (see NOTE above).
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHECKS_REF: ${{ github.event.inputs.ref || 'main' }}
+          ALLOW_CANONICAL_DRIFT: ${{ github.event.inputs.allow_canonical_drift || 'false' }}
+        run: node scripts/refresh-checks-snapshot.mjs
+
+      - name: Evaluate change
+        id: eval
+        env:
+          BEFORE_SHA: ${{ steps.before.outputs.sha }}
+        run: |
+          NEW=$(jq -r '._provenance.blobSha' src/app/wizard/config/checks-snapshot.json)
+          case "$NEW" in
+            (*[!0-9a-f]*|'') echo "invalid blob SHA" >&2; exit 1 ;;
+          esac
+          [ "${#NEW}" -eq 40 ] || { echo "invalid blob SHA length" >&2; exit 1; }
+          echo "sha=$NEW" >> "$GITHUB_OUTPUT"
+          if [ "$BEFORE_SHA" = "$NEW" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "snapshot already up to date (blobSha $NEW)"
+            # Discard the fetchedAt-only churn so no PR is opened.
+            git checkout -- src/app/wizard/config/checks-snapshot.json || true
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.eval.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: refresh checks.json snapshot"
+          branch: chore/refresh-checks-snapshot
+          delete-branch: true
+          add-paths: src/app/wizard/config/checks-snapshot.json
+          title: "chore: refresh checks.json snapshot"
+          body: |
+            Automated refresh of `src/app/wizard/config/checks-snapshot.json`.
+
+            - **ref:** `${{ github.event.inputs.ref || 'main' }}`
+            - **blobSha:** `${{ steps.before.outputs.sha }}` → `${{ steps.eval.outputs.sha }}`
+
+            The refresh script validated that every wizard `canonicalId` still
+            resolves in the new snapshot. If that validation had failed, this PR
+            would not exist and the refresh step would be red — meaning a
+            `canonicalId` in `src/app/wizard/config/wizard.json` needs updating.

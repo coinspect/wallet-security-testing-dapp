@@ -1,0 +1,2319 @@
+{
+    "wizard": {
+        "id": "main-wizard",
+        "version": "1.0.0",
+        "metadata": {
+            "title": "Main Wizard",
+            "description": "Main wizard process flow",
+            "lastUpdated": "2024-01-01"
+        },
+        "config": {
+            "persistState": true,
+            "showProgressBar": true,
+            "allowSkipSteps": false,
+            "autoSave": true,
+            "timeoutMinutes": 30
+        },
+        "checks": {
+            "WSR-PHYS-002~Browser": {
+                "canonicalId": "WSR-PHYS-002~Browser.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-002~Browser",
+                        "canonicalId": "WSR-PHYS-002~Browser.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "precondition": {
+                                    "text": "Use a fresh install, or a wallet whose password you can change — you can’t test password rules on a wallet you need to keep using."
+                                },
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open a fresh install or the change-password screen.",
+                                        "expect": "Somewhere the wallet accepts a new password."
+                                    },
+                                    {
+                                        "action": "Try each weak password: 1234, 12345678, qwertyui, password.",
+                                        "expect": "Note which are accepted and which are rejected.",
+                                        "capture": "The wallet's response to each weak password"
+                                    },
+                                    {
+                                        "action": "Note any password rule the wallet states.",
+                                        "expect": "A minimum length or complexity requirement, if shown.",
+                                        "capture": "Any stated password requirement"
+                                    },
+                                    {
+                                        "action": "Record exactly which passwords you tried.",
+                                        "expect": "Your list of attempts, for the checklist."
+                                    }
+                                ],
+                                "images": []
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-002~Mobile": {
+                "canonicalId": "WSR-PHYS-002~Mobile.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-002~Mobile",
+                        "canonicalId": "WSR-PHYS-002~Mobile.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "precondition": {
+                                    "text": "Use a fresh install, or a wallet whose password you can change — you can’t test password rules on a wallet you need to keep using."
+                                },
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Check whether the wallet offers biometrics.",
+                                        "expect": "Fingerprint or face unlock, if available.",
+                                        "capture": "Whether biometrics are available"
+                                    },
+                                    {
+                                        "action": "At the PIN screen, try the weak PIN 1234.",
+                                        "expect": "Note whether the wallet accepts or rejects it.",
+                                        "capture": "The wallet's response to the weak PIN"
+                                    },
+                                    {
+                                        "action": "If accepted, lock the wallet and enter a wrong PIN six times.",
+                                        "expect": "Watch what happens on repeated failures."
+                                    },
+                                    {
+                                        "action": "Note any rate limiting after the fifth failed attempt.",
+                                        "expect": "A delay or lockout, if the wallet applies one.",
+                                        "capture": "The rate-limiting after the fifth failed attempt"
+                                    }
+                                ],
+                                "images": []
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-004": {
+                "canonicalId": "WSR-PHYS-004.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-004",
+                        "canonicalId": "WSR-PHYS-004.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Search the menu and settings for a lock-now control.",
+                                        "expect": "A control that locks the wallet immediately."
+                                    },
+                                    {
+                                        "action": "If you find it, use it.",
+                                        "expect": "The wallet actually locks.",
+                                        "capture": "The manual lock control"
+                                    }
+                                ],
+                                "images": [],
+                                "additionalCaptures": [
+                                    "If no manual-lock control exists anywhere: a screenshot of the menu or settings section where it would be expected"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-006~Browser": {
+                "canonicalId": "WSR-PHYS-006~Browser.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-006~Browser",
+                        "canonicalId": "WSR-PHYS-006~Browser.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open settings and find the auto-lock or timeout setting.",
+                                        "expect": "The auto-lock or timeout setting, and its current value.",
+                                        "capture": "The auto-lock setting and its timeout value"
+                                    },
+                                    {
+                                        "action": "Note its value.",
+                                        "expect": "0 or 'never' means the wallet does not auto-lock."
+                                    },
+                                    {
+                                        "action": "If there is no such setting, leave the wallet idle 20 minutes.",
+                                        "expect": "See whether it locks on its own."
+                                    }
+                                ],
+                                "images": [],
+                                "additionalCaptures": [
+                                    "If there is no auto-lock setting: a screenshot of the security or settings section, plus a note on whether it locked after idling"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-006~Mobile": {
+                "canonicalId": "WSR-PHYS-006~Mobile.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-006~Mobile",
+                        "canonicalId": "WSR-PHYS-006~Mobile.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open settings and check the auto-lock timer value.",
+                                        "expect": "The configured auto-lock timeout.",
+                                        "capture": "The auto-lock setting and its timeout"
+                                    },
+                                    {
+                                        "action": "Background the app, then reopen it.",
+                                        "expect": "Does it ask you to unlock?",
+                                        "capture": "The wallet's state after backgrounding, and after device lock"
+                                    },
+                                    {
+                                        "action": "Lock the device, then reopen the wallet.",
+                                        "expect": "Does it ask you to unlock?"
+                                    },
+                                    {
+                                        "action": "If there is no setting, leave it idle.",
+                                        "expect": "See whether it locks on its own."
+                                    }
+                                ],
+                                "images": []
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-005": {
+                "canonicalId": "WSR-PHYS-005.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-005",
+                        "canonicalId": "WSR-PHYS-005.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open the screen that shows your seed phrase or private key.",
+                                        "expect": "The secret-display or reveal screen."
+                                    },
+                                    {
+                                        "action": "Note whether the wallet authenticates first.",
+                                        "expect": "A password, PIN, or biometric prompt before the secret.",
+                                        "capture": "The authentication prompt before the secret, showing which method",
+                                        "exampleImage": "step-02.png"
+                                    },
+                                    {
+                                        "action": "Note which method it requires.",
+                                        "expect": "Password, PIN, or biometrics."
+                                    }
+                                ],
+                                "images": [],
+                                "additionalCaptures": [
+                                    "If the secret is shown with no authentication at all: a screenshot of the secret displayed without any prompt"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-003": {
+                "canonicalId": "WSR-PHYS-003.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-003",
+                        "canonicalId": "WSR-PHYS-003.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open the screen that reveals your seed phrase or private key.",
+                                        "expect": "The reveal screen."
+                                    },
+                                    {
+                                        "action": "Before it reveals, look for a warning about the risk.",
+                                        "expect": "A clear warning about sharing the secret.",
+                                        "capture": "The warning shown before the secret is revealed"
+                                    },
+                                    {
+                                        "action": "Note how clearly the warning states the risk.",
+                                        "expect": "Whether it explains the danger plainly."
+                                    }
+                                ],
+                                "images": [],
+                                "additionalCaptures": [
+                                    "If no warning appears: a screenshot of the reveal screen with no warning"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PHYS-001": {
+                "canonicalId": "WSR-PHYS-001.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PHYS-001",
+                        "canonicalId": "WSR-PHYS-001.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open the screen that shows your seed phrase, and authenticate if the wallet asks.",
+                                        "expect": "An authentication prompt, if the wallet requires one."
+                                    },
+                                    {
+                                        "action": "Copy the seed phrase using the wallet's copy control.",
+                                        "expect": "Watch for a clipboard-risk warning.",
+                                        "capture": "The wallet's response when the seed phrase is copied"
+                                    },
+                                    {
+                                        "action": "Check whether the clipboard clears within a minute.",
+                                        "expect": "Whether the copied secret is auto-cleared, and how soon.",
+                                        "capture": "Whether the clipboard cleared, and after how long"
+                                    },
+                                    {
+                                        "action": "On mobile, take a screenshot of the seed screen.",
+                                        "expect": "Whether the wallet blocks or warns about the screenshot.",
+                                        "capture": "On mobile: the response to a screenshot attempt"
+                                    }
+                                ],
+                                "images": []
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-005": {
+                "canonicalId": "WSR-PERM-005.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-005",
+                        "canonicalId": "WSR-PERM-005.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Find the token-approvals section. Try Settings, Security, or a token's detail screen.",
+                                        "expect": "A token-approvals or connected-sites screen.",
+                                        "capture": "The approval-management screen, showing whether approvals are listed and revocable"
+                                    },
+                                    {
+                                        "action": "Check whether it lists approvals and lets you revoke them.",
+                                        "expect": "Existing approvals with a revoke option."
+                                    },
+                                    {
+                                        "action": "If it links out to an external site instead, note which one.",
+                                        "expect": "That still counts. Record the site."
+                                    }
+                                ],
+                                "images": [],
+                                "additionalCaptures": [
+                                    "If the wallet has no approval-management anywhere: a screenshot of the settings or security section where it would be expected"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-007": {
+                "canonicalId": "WSR-THRE-007.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-007",
+                        "canonicalId": "WSR-THRE-007.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "wallet-ui-manual"
+                        },
+                        "ui": {
+                            "content": {
+                                "precondition": {
+                                    "text": "This check needs a wallet that has already received spam tokens or NFTs. A long-lived mainnet address usually has some. The spam contract address is something you discover and record in the checklist notes — it is not a dApp parameter."
+                                },
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open the token and NFT lists as shown by default.",
+                                        "expect": "The default view, no filters changed.",
+                                        "capture": "The default asset view, showing whether spam appears or is filtered out",
+                                        "captureShort": "Default asset view"
+                                    },
+                                    {
+                                        "action": "Look for spam: tokens or NFTs you never acquired.",
+                                        "expect": "Often URLs or 'claim' text in their names."
+                                    },
+                                    {
+                                        "action": "Note whether the wallet hides them or shows them among real holdings.",
+                                        "expect": "Whether spam is filtered out by default."
+                                    },
+                                    {
+                                        "action": "If spam is visible, copy its contract address.",
+                                        "expect": "Record it in the checklist. It isn't a dApp parameter."
+                                    }
+                                ],
+                                "images": [],
+                                "additionalCaptures": [
+                                    {
+                                        "text": "If the wallet shows no NFTs at all: a screenshot of the tokens or assets view it does show",
+                                        "captureShort": "Tokens or assets view"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-001": {
+                "canonicalId": "WSR-THRE-001.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-001",
+                        "canonicalId": "WSR-THRE-001.v1",
+                        "walletState": "any",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 11,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "BadgeCheck",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Request Connection.",
+                                        "expectShort": "Look for an unknown or unverified flag.",
+                                        "expect": "This connects the unknown testing dApp. Look for an unknown or unverified flag.",
+                                        "capture": "Connection screen for this unknown dApp"
+                                    },
+                                    {
+                                        "action": "Separately, open a well-known dApp from the links below and connect there too.",
+                                        "expect": "Check whether the wallet shows a verified or trusted badge for a known dApp.",
+                                        "capture": "Connection screen for the known dApp — done manually"
+                                    },
+                                    {
+                                        "action": "Reject both connections.",
+                                        "expect": "The finding is whether the wallet distinguishes verified from unknown."
+                                    }
+                                ],
+                                "links": ["verified_dapp_url", "aave_dapp_url", "curve_dapp_url"],
+                                "linksTitle": "Known dApps to compare",
+                                "images": [],
+                                "button": {
+                                    "text": "Request Connection",
+                                    "loadingText": "Verifying...",
+                                    "action": "requestConnection"
+                                },
+                                "successMessage": "Wallet distinguished the trusted dApp from the unknown one.",
+                                "errorMessage": "Wallet did not indicate dApp trust status."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-003": {
+                "canonicalId": "WSR-THRE-003.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-003",
+                        "canonicalId": "WSR-THRE-003.v1",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 14,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ExternalLink",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Open phishing site (new tab) — it opens the first URL from the list below.",
+                                        "expect": "A phishing URL opens in a new tab.",
+                                        "capture": "Wallet or browser response when opening the phishing URL"
+                                    },
+                                    {
+                                        "action": "Watch your wallet or browser for a warning or block that the site is dangerous.",
+                                        "expect": "Note whether it warns, blocks, or opens with no warning."
+                                    },
+                                    {
+                                        "action": "Work through the full list below, opening each URL one at a time.",
+                                        "expect": "Some wallets warn on some domains and not others — record which ones warn.",
+                                        "capture": "Wallet or browser response for each phishing URL in the list"
+                                    },
+                                    {
+                                        "action": "Close the tab(s) without interacting with the sites.",
+                                        "expect": "Do not enter anything or connect."
+                                    }
+                                ],
+                                "links": ["scam_dapp_url", "scam_dapp_url_2", "scam_dapp_url_3", "scam_dapp_url_4", "scam_dapp_url_5", "scam_dapp_url_6", "scam_dapp_url_7", "scam_dapp_url_8", "scam_dapp_url_9", "scam_dapp_url_10"],
+                                "linksTitle": "Phishing URLs — try each (team-curated, re-verify)",
+                                "images": [],
+                                "button": {
+                                    "text": "Open phishing site (new tab)",
+                                    "loadingText": "Opening...",
+                                    "action": "openScamUrl"
+                                },
+                                "successMessage": "Opened the phishing URL — capture the wallet/browser warning.",
+                                "errorMessage": "Could not open the phishing URL."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-006": {
+                "canonicalId": "WSR-THRE-006.v1",
+                "walletOnly": true,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-006",
+                        "canonicalId": "WSR-THRE-006.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 9,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "Link",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open each dApp below and connect your wallet there.",
+                                        "expect": "A connection request opens showing that dApp's origin.",
+                                        "capture": "Connection prompt showing the origin — full or truncated"
+                                    },
+                                    {
+                                        "action": "See whether the wallet shows the full origin or truncates it, and whether you can reveal the rest.",
+                                        "expect": "The finding is whether the whole origin is visible or cut off."
+                                    },
+                                    {
+                                        "action": "Reject each connection.",
+                                        "expect": "Nothing is connected."
+                                    }
+                                ],
+                                "links": ["polygon_staking_dapp_url", "polygon_portal_dapp_url", "olympusdao_dapp_url"],
+                                "linksTitle": "Connect at each dApp",
+                                "images": []
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-004": {
+                "canonicalId": "WSR-THRE-004.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-004",
+                        "canonicalId": "WSR-THRE-004.v1",
+                        "walletState": "any",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 10,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ShieldCheck",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Request Connection.",
+                                        "expect": "A connection request opens describing what the dApp can do.",
+                                        "capture": "Connection dialog showing what access is granted"
+                                    },
+                                    {
+                                        "action": "Check the request discloses access to your balance, activity, and approvals, then cancel or reject it.",
+                                        "expect": "Whether the wallet clearly discloses that access."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Request Connection",
+                                    "loadingText": "Verifying...",
+                                    "action": "requestConnection"
+                                },
+                                "successMessage": "Wallet disclosed the access the dApp would gain.",
+                                "errorMessage": "Wallet did not disclose dApp access on connection."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-004": {
+                "canonicalId": "WSR-PERM-004.v1",
+                "walletOnly": false,
+                "presentation": "connection-management",
+                "steps": [
+                    {
+                        "id": "WSR-PERM-004",
+                        "canonicalId": "WSR-PERM-004.v1",
+                        "walletState": "any",
+                        "actionLabel": "Connect this dApp",
+                        "expectedOutcome": "approve",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "connected-dapp-management"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Connect this dApp and Uniswap using the same wallet.",
+                                        "expect": "Both dApps appear in the wallet's connected-dApps list."
+                                    },
+                                    {
+                                        "action": "Disconnect this testing dApp from the wallet's list.",
+                                        "capture": "Both connected dApps and the removal of the testing dApp"
+                                    },
+                                    {
+                                        "action": "Click Check access after disconnecting without reconnecting.",
+                                        "expect": "Record the original session's termination or the provider's account and permission responses. Errors, missing sessions and cached WalletConnect accounts alone are inconclusive.",
+                                        "capture": "The access-check result"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Connect this dApp",
+                                    "loadingText": "Connecting…",
+                                    "action": "requestConnection"
+                                },
+                                "additionalCaptures": [
+                                    "If the wallet offers no connected-dApps management: a screenshot of the section where it would be expected"
+                                ]
+                            }
+                        },
+                        "data": {
+                            "params": {}
+                        }
+                    },
+                    {
+                        "id": "WSR-PERM-004-2",
+                        "canonicalId": "WSR-PERM-004.v1",
+                        "walletState": "disconnected",
+                        "actionLabel": "Check access after disconnecting",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 1,
+                            "status": "pending",
+                            "type": "connected-dapp-management"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Check access after disconnecting",
+                                    "loadingText": "Checking access…",
+                                    "action": "checkRevokedAccess"
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "eth_accounts",
+                                    "wallet_getPermissions"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-001": {
+                "canonicalId": "WSR-PERM-001.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-001",
+                        "canonicalId": "WSR-PERM-001.v1",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 7,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "GlobeWarning",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Connect your wallet using the button in the header.",
+                                        "expect": "The wallet shows a connected address."
+                                    },
+                                    {
+                                        "action": "Click Send SIWE message.",
+                                        "expect": "A sign-in message claims opensea.io while you're on the testing dApp.",
+                                        "capture": "Wallet's SIWE sign-in request"
+                                    },
+                                    {
+                                        "action": "Reject or cancel the request.",
+                                        "expect": "Look for a domain-mismatch warning. You never need to sign."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Send SIWE message",
+                                    "loadingText": "Verifying...",
+                                    "action": "siweSign"
+                                },
+                                "successMessage": "Wallet warned about domain mismatch.",
+                                "errorMessage": "Wallet failed to warn about mismatched domain."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-001": {
+                "canonicalId": "WSR-VERI-001.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-001",
+                        "canonicalId": "WSR-VERI-001.v1",
+                        "expectedOutcome": "approve",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 3,
+                            "status": "pending",
+                            "type": "checksum-validation"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "KeySquare",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": [
+                                            "Click Send Invalid Checksum Transaction",
+                                            "Approve it in your wallet",
+                                            "Copy the recipient address exactly as the wallet shows it"
+                                        ],
+                                        "expectShort": "The wallet shows the raw address string, and its casing is visible.",
+                                        "expect": "The wallet shows the raw address string, and its casing is visible. It is a 0-value transaction to an arbitrary address the wallet has no name for, addressed with a deliberately wrong checksum — an unnamed recipient is what forces the wallet to render the raw casing.",
+                                        "capture": "Wallet's approval dialog for the bad-checksum address"
+                                    },
+                                    {
+                                        "action": "Note what the wallet did: warned, blocked, silently corrected the casing, or sent it as-is.",
+                                        "expect": "A refused or failed transaction still counts as blocked.",
+                                        "capture": "Wallet's handling of the bad checksum — a warning, a block, a silent correction, or the broadcast transaction"
+                                    },
+                                    {
+                                        "action": "Separately, in your wallet's own send screen, type the bad-checksum address shown below by hand, then REJECT.",
+                                        "expect": "This tests the wallet's input validation on manual entry. Nothing is sent.",
+                                        "capture": "Wallet's response to the bad-checksum address typed manually in the send screen"
+                                    }
+                                ],
+                                "copyValues": ["checksum_probe_bad_checksum"],
+                                "copyValuesTitle": "Address to type by hand",
+                                "checksumVerifier": true,
+                                "images": [],
+                                "button": {
+                                    "text": "Send Invalid Checksum Transaction",
+                                    "loadingText": "Verifying...",
+                                    "action": "sendInvalidChecksumTransaction"
+                                },
+                                "successMessage": "Transaction request sent — capture the wallet's handling of the bad checksum.",
+                                "errorMessage": "The request did not complete."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "target": "checksumProbeBadChecksum",
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-002": {
+                "canonicalId": "WSR-THRE-002.v2",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-002",
+                        "canonicalId": "WSR-THRE-002.v2",
+                        "actionLabel": "Setup — seed familiar recipient",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 1,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ShieldAlert",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "precondition": {
+                                    "text": "This check needs a lookalike of an address you have ALREADY sent to. The Setup step below establishes that history — approve its 0-value transaction to 0x873050043AF661fe9d5633369B10139eb7b4Da54 first. Without that history there is nothing for the lookalike to imitate.",
+                                    "link": "https://polygonscan.com/address/0x873050043AF661fe9d5633369B10139eb7b4Da54"
+                                },
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "First, click Send Setup Transaction to Familiar Recipient and APPROVE it in your wallet.",
+                                        "expectShort": "The ONLY request you approve — a 0-value send to the familiar recipient shown below. Skip only if this wallet has already sent to that address.",
+                                        "expect": "The ONLY request you approve — a 0-value send to the familiar recipient shown below. Skip only if this wallet has already sent to that address. It creates the history the lookalike must imitate.",
+                                        "capture": "Wallet confirmation of the approved 0-value setup transaction to the familiar recipient"
+                                    },
+                                    {
+                                        "action": "Click Send Scam Transaction, then reject it.",
+                                        "expect": "A request to a known malicious address opens. Look for a warning.",
+                                        "capture": "Wallet request showing the malicious address"
+                                    },
+                                    {
+                                        "action": "Click Send Poisoned Transaction, then reject it.",
+                                        "expect": "A request to a lookalike of the familiar recipient opens. Look for a warning.",
+                                        "capture": "Wallet request showing the lookalike (poisoned) address"
+                                    },
+                                    {
+                                        "action": "In your wallet's own send screen, type both addresses shown below by hand, then reject each.",
+                                        "expect": "Check whether the wallet warns on manual entry too, not only when a dApp supplies it. Nothing is sent.",
+                                        "capture": "Wallet's response to each address typed manually in the send screen"
+                                    }
+                                ],
+                                "copyValues": ["familiar_recipient_target", "scam_address_target", "poison_address_target"],
+                                "copyValuesTitle": "Addresses in this check",
+                                "images": [],
+                                "button": {
+                                    "text": "Send Setup Transaction to Familiar Recipient",
+                                    "loadingText": "Verifying...",
+                                    "action": "sendFamiliarRecipientTransaction"
+                                },
+                                "successMessage": "Setup transaction submitted to the familiar recipient.",
+                                "errorMessage": "Setup transaction was not submitted.",
+                                "additionalCaptures": [
+                                    "Done by hand in the wallet UI: a screenshot of the same two addresses typed manually"
+                                ]
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "target": "familiarRecipient",
+                                "chain": "polygon"
+                            }
+                        }
+                    },
+                    {
+                        "id": "WSR-THRE-002-2",
+                        "canonicalId": "WSR-THRE-002.v2",
+                        "actionLabel": "Malicious address",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 2,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ShieldAlert",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Send Scam Transaction",
+                                    "loadingText": "Verifying...",
+                                    "action": "sendScamTransaction"
+                                },
+                                "successMessage": "Wallet successfully displayed a phishing warning.",
+                                "errorMessage": "Wallet failed to warn about known phishing address."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "target": "scamAddress",
+                                "chain": "polygon"
+                            }
+                        }
+                    },
+                    {
+                        "id": "WSR-THRE-002-3",
+                        "canonicalId": "WSR-THRE-002.v2",
+                        "actionLabel": "Lookalike (poisoned) address",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 3,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ShieldAlert",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Send Poisoned Transaction",
+                                    "loadingText": "Verifying...",
+                                    "action": "sendPoisonTransaction"
+                                },
+                                "successMessage": "Wallet flagged the lookalike (poisoned) address.",
+                                "errorMessage": "Wallet failed to warn about the lookalike address."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "target": "poisonAddress",
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-002": {
+                "canonicalId": "WSR-VERI-002.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-002",
+                        "canonicalId": "WSR-VERI-002.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "risky-interaction-prevention"
+                        },
+                        "validation": {
+                            "rules": [
+                                "requireAuthentication"
+                            ],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Connect using the button in the header, then unlock your wallet.",
+                                        "expect": "The wallet is connected and unlocked."
+                                    },
+                                    {
+                                        "action": "Click Send Test Transaction.",
+                                        "expect": "A transaction request opens in your wallet."
+                                    },
+                                    {
+                                        "action": "On the confirmation screen, check whether the addresses and identifiers are clickable block-explorer links, then reject the request. Nothing should be sent.",
+                                        "expect": "Whether the addresses and identifiers link out to a block explorer.",
+                                        "capture": "The confirmation screen, showing whether identifiers are clickable"
+                                    },
+                                    {
+                                        "action": "Open your transaction history and check the same.",
+                                        "expect": "Whether addresses and tx hashes there link out too.",
+                                        "capture": "The transaction history, showing the same"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Send Test Transaction",
+                                    "loadingText": "Opening request…",
+                                    "action": "sendExplorerLinkTransaction"
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "target": "testerWallet2"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-THRE-005": {
+                "canonicalId": "WSR-THRE-005.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-THRE-005",
+                        "canonicalId": "WSR-THRE-005.v1",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 2,
+                            "status": "pending",
+                            "type": "risky-interaction-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "AlertTriangle",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Send Unknown Transaction.",
+                                        "expect": "A request opens to a fresh, never-used address.",
+                                        "capture": "Wallet request showing the unknown address"
+                                    },
+                                    {
+                                        "action": "Reject the request in your wallet.",
+                                        "expect": "Check whether it flagged the recipient as unknown or first-time."
+                                    },
+                                    {
+                                        "action": "In your wallet's own send screen, type the same fresh address you used above (default, shown below) by hand, then reject.",
+                                        "expect": "Check whether the wallet flags it as unknown/first-time on manual entry too, not only when a dApp supplies it. Nothing is sent.",
+                                        "capture": "Wallet's response to the unknown address typed manually in the send screen"
+                                    }
+                                ],
+                                "copyValues": ["unknown_address_target"],
+                                "copyValuesTitle": "Address to type by hand",
+                                "images": [],
+                                "button": {
+                                    "text": "Send Unknown Transaction",
+                                    "loadingText": "Verifying...",
+                                    "action": "sendUnknownTransaction"
+                                },
+                                "successMessage": "Wallet displayed a warning for unknown addresses.",
+                                "errorMessage": "Wallet did not alert about unknown address.",
+                                "additionalCaptures": [
+                                    "Done by hand in the wallet UI: a screenshot of the same address typed manually"
+                                ]
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "target": "unknownAddress",
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-003": {
+                "canonicalId": "WSR-PERM-003.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-003",
+                        "canonicalId": "WSR-PERM-003.v1",
+                        "expectedOutcome": "approve",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 6,
+                            "status": "pending",
+                            "type": "risky-dapp-prevention"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "Network",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Send EIP-712 with different chain ID.",
+                                        "expect": "The message claims chainId 1223123 while you're on Polygon (137).",
+                                        "capture": "Wallet response to the mismatched chainId"
+                                    },
+                                    {
+                                        "action": "Approve the request.",
+                                        "expect": "Look for a warning about the chainId mismatch. The returned signature is recorded as evidence."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Send EIP-712 with different chain ID",
+                                    "loadingText": "Verifying...",
+                                    "action": "differentChainId"
+                                },
+                                "successMessage": "Wallet warned about mismatched chainId.",
+                                "errorMessage": "Wallet allowed signing with wrong chainId."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-006": {
+                "canonicalId": "WSR-VERI-006.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-006",
+                        "canonicalId": "WSR-VERI-006.v1",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 4,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "FileSearch",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Send personal_sign and two EIP-712 requests.",
+                                        "expect": "Three requests open in turn: a large personal_sign message, a Seaport order (EIP-712), then an ERC-2612 permit (EIP-712).",
+                                        "capture": "Wallet rendering of the large personal_sign payload"
+                                    },
+                                    {
+                                        "action": "On the Seaport EIP-712 request, scroll through all the data.",
+                                        "expect": "Check every field is readable and nothing is truncated, and that the verifyingContract is shown — either as its raw address or resolved to a contract/token name; either counts as shown.",
+                                        "capture": "Wallet rendering of the Seaport EIP-712 payload, including verifyingContract"
+                                    },
+                                    {
+                                        "action": "On the permit EIP-712 request, scroll through all the data.",
+                                        "expect": "Same checks: every field readable and not truncated, and the verifyingContract shown as its raw address or resolved to a name — either counts as shown.",
+                                        "capture": "Wallet rendering of the permit EIP-712 payload, including verifyingContract"
+                                    },
+                                    {
+                                        "action": "Click Reject on each request.",
+                                        "expect": "You never need to sign. Nothing is signed."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Send personal_sign and two EIP-712 requests",
+                                    "loadingText": "Verifying...",
+                                    "action": "clearMethodSignRequest"
+                                },
+                                "successMessage": "Wallet displayed all signing details clearly.",
+                                "errorMessage": "Wallet truncated or hid signing details."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-004": {
+                "canonicalId": "WSR-VERI-004.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-004",
+                        "canonicalId": "WSR-VERI-004.v1",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 12,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "FileSearch",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Sign Permit and Seaport order.",
+                                        "expectShort": "Two EIP-712 requests open in turn: first an ERC-2612 permit (flat fields), then an OpenSea Seaport order (nested structs and arrays). Record both renderings even if the wallet parses one and not the other.",
+                                        "expect": "Two EIP-712 requests open in turn: first an ERC-2612 permit (flat fields), then an OpenSea Seaport order (nested structs and arrays). Record both renderings even if the wallet parses one and not the other. The flat permit and the nested order exercise different rendering depth."
+                                    },
+                                    {
+                                        "action": "On the permit request, note whether the wallet renders token, spender and amount as labelled, structured detail or dumps raw JSON, then reject.",
+                                        "expect": "The finding is whether the flat permit fields are parsed into human-readable labels.",
+                                        "capture": "Wallet rendering of the ERC-2612 permit — labelled fields or raw JSON"
+                                    },
+                                    {
+                                        "action": "On the Seaport order, note whether the nested offer/consideration items and bytes32 fields are rendered as structured, labelled detail or raw JSON, then reject.",
+                                        "expect": "The finding is whether the deeper nested order is parsed into human-readable structure.",
+                                        "capture": "Wallet rendering of the Seaport order — structured detail or raw JSON"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Sign Permit and Seaport order",
+                                    "loadingText": "Verifying...",
+                                    "action": "signPermitAndSeaport"
+                                },
+                                "successMessage": "Signing requests sent — capture each rendering.",
+                                "errorMessage": "A signing request failed."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-006": {
+                "canonicalId": "WSR-PERM-006.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-006",
+                        "canonicalId": "WSR-PERM-006.v1",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 5,
+                            "status": "pending",
+                            "type": "dapp-access-control"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ShieldOff",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Send eth_sign request.",
+                                        "expect": "The wallet is asked to sign a raw, unreadable blob via eth_sign.",
+                                        "capture": "Wallet response to the eth_sign request"
+                                    },
+                                    {
+                                        "action": "If the wallet lets you sign, click Reject.",
+                                        "expect": "Note whether the wallet refuses eth_sign, converts it to personal_sign, or signs the raw blob."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Send eth_sign request",
+                                    "loadingText": "Verifying...",
+                                    "action": "ethSignMethod"
+                                },
+                                "successMessage": "Wallet blocked or warned before eth_sign use.",
+                                "errorMessage": "Wallet allowed eth_sign by default."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-007": {
+                "canonicalId": "WSR-VERI-007.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-007",
+                        "canonicalId": "WSR-VERI-007.v1",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 13,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ScrollText",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Send Long Message and EIP-712 request.",
+                                        "expect": "Two requests open in turn: first a long personal_sign message, then a large EIP-712 typed-data request.",
+                                        "capture": "Wallet's sign button on the long personal_sign request, before scrolling"
+                                    },
+                                    {
+                                        "action": "On EACH request, try to sign before scrolling, then scroll to the very bottom.",
+                                        "expectShort": "Note for each whether the Sign button stayed disabled until you reached the end.",
+                                        "expect": "Note for each whether the Sign button stayed disabled until you reached the end. personal_sign is informational; the EIP-712 request is the one that counts.",
+                                        "capture": "Wallet's sign button on the EIP-712 request, before and after scrolling to the end"
+                                    },
+                                    {
+                                        "action": "Click Reject on each.",
+                                        "expect": "You never need to sign. Nothing is signed."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Send Long Message and EIP-712 request",
+                                    "loadingText": "Verifying...",
+                                    "action": "signLongMessageAndTypedData"
+                                },
+                                "successMessage": "Wallet required scrolling through the full message before signing.",
+                                "errorMessage": "Wallet allowed signing without reviewing the full message."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": []
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-002~Browser": {
+                "canonicalId": "WSR-PERM-002~Browser.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-002~Browser",
+                        "canonicalId": "WSR-PERM-002~Browser.v1",
+                        "walletState": "locked",
+                        "actionLabel": "Run Auth Bypass",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "auth-bypass-batch"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Connect this dApp to your wallet.",
+                                        "expect": "The dApp is connected."
+                                    },
+                                    {
+                                        "action": "Lock the wallet.",
+                                        "expect": "The wallet is locked but still connected."
+                                    },
+                                    {
+                                        "action": "Click Run Auth Bypass.",
+                                        "expect": "The same seven requests run while the wallet is locked. Each should prompt you to unlock."
+                                    },
+                                    {
+                                        "action": "Reject every prompt.",
+                                        "expect": "Data returned from a locked wallet is the finding.",
+                                        "capture": "The results table"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Run Auth Bypass",
+                                    "loadingText": "Running…",
+                                    "action": "runAuthBypass"
+                                },
+                                "precondition": {
+                                    "text": "Connect first, then lock the wallet. The check is whether a locked wallet still serves requests — so the order matters. Switch the wallet to Polygon before you lock it — this check can't switch it for you."
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "wallet_addEthereumChain",
+                                    "wallet_watchAsset",
+                                    "eth_decrypt",
+                                    "eth_getEncryptionPublicKey",
+                                    "eth_signTypedData_v4",
+                                    "personal_sign",
+                                    "eth_sendTransaction"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-008~Browser": {
+                "canonicalId": "WSR-PERM-008~Browser.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-008~Browser",
+                        "canonicalId": "WSR-PERM-008~Browser.v1",
+                        "walletState": "disconnected",
+                        "actionLabel": "Run Auth Bypass",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "auth-bypass-batch"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Make sure this dApp is not connected. Revoke it if it is.",
+                                        "expect": "No active connection to this dApp."
+                                    },
+                                    {
+                                        "action": "Confirm your address in the field below.",
+                                        "expect": "The address the batch will use."
+                                    },
+                                    {
+                                        "action": "Click Run Auth Bypass.",
+                                        "expect": "Each request should be rejected or ask you to connect. Nothing should just answer."
+                                    },
+                                    {
+                                        "action": "Reject every prompt.",
+                                        "expect": "Anything a request answers on its own, while disconnected, is the finding.",
+                                        "capture": "The results table"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Run Auth Bypass",
+                                    "loadingText": "Running…",
+                                    "action": "runAuthBypass"
+                                },
+                                "precondition": {
+                                    "text": "This dApp must not be connected. If it is, revoke it in your wallet first — the check tests access BEFORE permission is granted. Switch the wallet to Polygon before you start — this check can't switch it for you.",
+                                    "action": "disconnect"
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "eth_accounts",
+                                    "eth_decrypt",
+                                    "eth_getEncryptionPublicKey",
+                                    "eth_signTypedData_v4",
+                                    "personal_sign",
+                                    "eth_sendTransaction"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-009": {
+                "canonicalId": "WSR-PERM-009.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-009",
+                        "canonicalId": "WSR-PERM-009.v1",
+                        "actionLabel": "Common chain (prompt)",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 8,
+                            "status": "pending",
+                            "type": "dapp-access-control"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ArrowLeftRight",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Switch to Ethereum Mainnet, then cancel the request.",
+                                        "expectShort": "The wallet should ask you to confirm switching to a chain it almost certainly already has.",
+                                        "expect": "The wallet should ask you to confirm switching to a chain it almost certainly already has — so the confirmation prompt itself is observable.",
+                                        "capture": "Wallet's confirmation prompt for the chain switch"
+                                    },
+                                    {
+                                        "action": "Click Switch to zkSync Era, then cancel if prompted.",
+                                        "expectShort": "An uncommon chain: the wallet may ask you to confirm, OR return 4902 (unrecognized chain) with no prompt — both are valid observations.",
+                                        "expect": "An uncommon chain: the wallet may ask you to confirm, OR return 4902 (unrecognized chain) with no prompt — both are valid observations. A 4902 means the wallet has no zkSync network configured; declining a switch it cannot perform is not an error.",
+                                        "capture": "Wallet's response — a confirmation prompt, or the 4902 (unrecognized chain) result"
+                                    },
+                                    {
+                                        "action": "Cancel each request to stay on your current network.",
+                                        "expect": "The finding is whether the wallet confirms before switching, or blocks a switch to a non-approved network. Nothing switches."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Switch to Ethereum Mainnet",
+                                    "loadingText": "Verifying...",
+                                    "action": "switchChains"
+                                },
+                                "successMessage": "Chain-switch request sent — capture the wallet's confirmation prompt.",
+                                "errorMessage": "Wallet switched chains automatically without consent."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "switchTo": "mainnet"
+                            }
+                        }
+                    },
+                    {
+                        "id": "WSR-PERM-009-2",
+                        "canonicalId": "WSR-PERM-009.v1",
+                        "actionLabel": "Uncommon chain (4902)",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 9,
+                            "status": "pending",
+                            "type": "dapp-access-control"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "ArrowLeftRight",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Switch to zkSync Era",
+                                    "loadingText": "Verifying...",
+                                    "action": "switchChains"
+                                },
+                                "successMessage": "Chain-switch request sent — capture the wallet's response (prompt or 4902).",
+                                "errorMessage": "Wallet switched chains automatically without consent."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "switchTo": "zksync"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-010~Browser": {
+                "canonicalId": "WSR-PERM-010~Browser.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-010~Browser",
+                        "canonicalId": "WSR-PERM-010~Browser.v1",
+                        "actionLabel": "Run Auth Bypass",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "auth-bypass-batch"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Connect using the button in the header, then unlock your wallet.",
+                                        "expect": "The wallet is connected and unlocked."
+                                    },
+                                    {
+                                        "action": "Click Run Auth Bypass.",
+                                        "expect": "Each of the seven requests should open its own confirmation."
+                                    },
+                                    {
+                                        "action": "Reject every prompt.",
+                                        "expect": "Anything a request returns on its own is the finding.",
+                                        "capture": "The results table"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Run Auth Bypass",
+                                    "loadingText": "Running…",
+                                    "action": "runAuthBypass"
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "wallet_addEthereumChain",
+                                    "wallet_watchAsset",
+                                    "eth_decrypt",
+                                    "eth_getEncryptionPublicKey",
+                                    "eth_signTypedData_v4",
+                                    "personal_sign",
+                                    "eth_sendTransaction"
+                                ],
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-002~Mobile": {
+                "canonicalId": "WSR-PERM-002~Mobile.v1",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-002~Mobile",
+                        "canonicalId": "WSR-PERM-002~Mobile.v1",
+                        "walletState": "locked",
+                        "actionLabel": "Run Auth Bypass",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "auth-bypass-batch"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Pair this dApp with your mobile wallet (Connect in the header, scan the QR).",
+                                        "expect": "The wallet is paired."
+                                    },
+                                    {
+                                        "action": "Lock the wallet app (or your phone), keeping the pairing.",
+                                        "expect": "The wallet is locked but still paired."
+                                    },
+                                    {
+                                        "action": "Click Run Auth Bypass.",
+                                        "expect": "The same seven requests run while the wallet is locked."
+                                    },
+                                    {
+                                        "action": "Reject every prompt.",
+                                        "expect": "Data served by a locked wallet is the finding. A row marked session_dropped means the wallet dropped the pairing when locked — re-pair and retry; that is not the finding.",
+                                        "capture": "The results table"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Run Auth Bypass",
+                                    "loadingText": "Running\u2026",
+                                    "action": "runAuthBypass"
+                                },
+                                "precondition": {
+                                    "text": "Pair first, THEN lock the wallet \u2014 the order matters, because the check is whether a locked wallet still serves requests. A locked mobile wallet is not a locked extension: the WalletConnect session lives on the phone, so a locked wallet can still receive requests. If the wallet app drops the session while locked, requests come back as session_dropped (re-pair and retry); a locked wallet that serves or refuses a request is the finding. Switch the wallet to Polygon before locking it \u2014 this check can't switch it for you."
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "wallet_addEthereumChain",
+                                    "wallet_watchAsset",
+                                    "eth_decrypt",
+                                    "eth_getEncryptionPublicKey",
+                                    "eth_signTypedData_v4",
+                                    "personal_sign",
+                                    "eth_sendTransaction"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-007~Mobile": {
+                "canonicalId": "WSR-PERM-007~Mobile.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-007~Mobile",
+                        "canonicalId": "WSR-PERM-007~Mobile.v1",
+                        "actionLabel": "Run Auth Bypass",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "auth-bypass-batch"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Pair this dApp with your mobile wallet and keep it unlocked.",
+                                        "expect": "The wallet is paired and unlocked."
+                                    },
+                                    {
+                                        "action": "Click Run Auth Bypass.",
+                                        "expect": "Each of the seven requests should open its own confirmation in the wallet app."
+                                    },
+                                    {
+                                        "action": "Reject every prompt.",
+                                        "expect": "Anything a request returns on its own is the finding.",
+                                        "capture": "The results table"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Run Auth Bypass",
+                                    "loadingText": "Running\u2026",
+                                    "action": "runAuthBypass"
+                                },
+                                "precondition": {
+                                    "text": "Pair your mobile wallet and keep it unlocked. This check runs over WalletConnect and expects each request to prompt in the wallet app."
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "wallet_addEthereumChain",
+                                    "wallet_watchAsset",
+                                    "eth_decrypt",
+                                    "eth_getEncryptionPublicKey",
+                                    "eth_signTypedData_v4",
+                                    "personal_sign",
+                                    "eth_sendTransaction"
+                                ],
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-PERM-010~Mobile": {
+                "canonicalId": "WSR-PERM-010~Mobile.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-PERM-010~Mobile",
+                        "canonicalId": "WSR-PERM-010~Mobile.v1",
+                        "transport": "injected",
+                        "actionLabel": "Run Auth Bypass",
+                        "metadata": {
+                            "estimatedTime": "3min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 0,
+                            "status": "pending",
+                            "type": "auth-bypass-batch"
+                        },
+                        "ui": {
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Open this wizard page inside your wallet app's built-in browser, then unlock the wallet.",
+                                        "expect": "The wallet is connected and unlocked in its in-app browser."
+                                    },
+                                    {
+                                        "action": "Click Run Auth Bypass.",
+                                        "expect": "Each of the seven requests should open its own confirmation."
+                                    },
+                                    {
+                                        "action": "Reject every prompt.",
+                                        "expect": "Anything a request returns on its own is the finding.",
+                                        "capture": "The results table"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Run Auth Bypass",
+                                    "loadingText": "Running\u2026",
+                                    "action": "runAuthBypass"
+                                },
+                                "precondition": {
+                                    "text": "Open this page in your wallet app's built-in browser \u2014 this check uses the provider the wallet injects there (window.ethereum), not WalletConnect. If you open it in a normal mobile browser there is no injected provider, and the check will say so instead of running."
+                                }
+                            }
+                        },
+                        "data": {
+                            "params": {
+                                "methods": [
+                                    "wallet_addEthereumChain",
+                                    "wallet_watchAsset",
+                                    "eth_decrypt",
+                                    "eth_getEncryptionPublicKey",
+                                    "eth_signTypedData_v4",
+                                    "personal_sign",
+                                    "eth_sendTransaction"
+                                ],
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-005": {
+                "canonicalId": "WSR-VERI-005.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-005",
+                        "canonicalId": "WSR-VERI-005.v1",
+                        "actionLabel": "Approve USDC.e (known token)",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 15,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": [
+                                "requireAuthentication"
+                            ],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "FileSearch",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Approve USDC.e, then reject it after checking the details.",
+                                        "expect": "An unlimited approval of USDC.e \u2014 a recognizable token \u2014 opens.",
+                                        "capture": "Wallet's approval dialog for the KNOWN token (USDC.e): token, spender and amount"
+                                    },
+                                    {
+                                        "action": "Click Approve WSRT, then reject it.",
+                                        "expect": "The same unlimited approval opens, but for WSRT \u2014 a token the wallet has no metadata for. Compare how the wallet renders this UNKNOWN token against USDC.e.",
+                                        "capture": "Wallet's approval dialog for the UNKNOWN token (WSRT)"
+                                    },
+                                    {
+                                        "action": "Reject both approvals.",
+                                        "expect": "The finding is whether the wallet shows token, spender and amount clearly \u2014 and whether a known and an unknown token are rendered differently. Nothing is approved, and no gas is spent."
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Approve USDC.e",
+                                    "loadingText": "Verifying...",
+                                    "action": "approveTestErc20"
+                                },
+                                "successMessage": "Approval request sent \u2014 capture the approval dialog.",
+                                "errorMessage": "Approval request failed."
+                            }
+                        },
+                        "data": {
+                            "fields": [
+                                "authResult"
+                            ],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "chain": "polygon"
+                            }
+                        }
+                    },
+                    {
+                        "id": "WSR-VERI-005-2",
+                        "canonicalId": "WSR-VERI-005.v1",
+                        "actionLabel": "Approve WSRT (unknown token)",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 16,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": [
+                                "requireAuthentication"
+                            ],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "FileSearch",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Approve WSRT",
+                                    "loadingText": "Verifying...",
+                                    "action": "approveTestErc20"
+                                },
+                                "successMessage": "Approval request sent \u2014 capture the approval dialog.",
+                                "errorMessage": "Approval request failed."
+                            }
+                        },
+                        "data": {
+                            "fields": [
+                                "authResult"
+                            ],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "chain": "polygon",
+                                "useTestToken": true
+                            }
+                        }
+                    }
+                ]
+            },
+            "WSR-VERI-003": {
+                "canonicalId": "WSR-VERI-003.v1",
+                "requiredChain": "0x89",
+                "walletOnly": false,
+                "steps": [
+                    {
+                        "id": "WSR-VERI-003",
+                        "canonicalId": "WSR-VERI-003.v1",
+                        "actionLabel": "Provide liquidity",
+                        "metadata": {
+                            "estimatedTime": "2min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 16,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "Activity",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [
+                                    {
+                                        "action": "Click Provide Liquidity, then reject the request.",
+                                        "expect": "A liquidity mint opens. Check it previews what goes in and comes back.",
+                                        "capture": "Wallet request for the liquidity provision"
+                                    },
+                                    {
+                                        "action": "Click Perform Swap, then reject the request.",
+                                        "expect": "A POL to USDC.e swap opens. Check it previews the expected amounts.",
+                                        "capture": "Wallet request for the swap, showing the expected amounts"
+                                    }
+                                ],
+                                "images": [],
+                                "button": {
+                                    "text": "Provide Liquidity",
+                                    "loadingText": "Verifying...",
+                                    "action": "provideLiquidity"
+                                },
+                                "successMessage": "Liquidity provision sent — capture the wallet's preview.",
+                                "errorMessage": "Could not build the liquidity provision."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "chain": "polygon"
+                            }
+                        }
+                    },
+                    {
+                        "id": "WSR-VERI-003-2",
+                        "canonicalId": "WSR-VERI-003.v1",
+                        "actionLabel": "Perform swap",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 16,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": ["requireAuthentication"],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "Activity",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Perform Swap",
+                                    "loadingText": "Verifying...",
+                                    "action": "simulateSwap"
+                                },
+                                "successMessage": "Swap sent for simulation — capture the wallet's preview.",
+                                "errorMessage": "Could not build the swap simulation."
+                            }
+                        },
+                        "data": {
+                            "fields": ["authResult"],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "chain": "polygon"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+name: Security CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Use supported Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.13.0
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Reject committed credential material
+        run: npm run check:secrets
+      - name: Run security regressions
+        run: npm test
+      - name: Run static analysis
+        run: npm run lint
+      - name: Verify token artifact provenance
+        run: npm run verify:token
+      - name: Build production application
+        run: npm run build
+      - name: Verify static export
+        run: node scripts/verify-static-build.mjs
+      - name: Reject moderate-or-higher production advisories
+        run: npm audit --omit=dev --audit-level=moderate

@@ -1,0 +1,64 @@
+{
+	"name": "wallet-security-testing-dapp",
+	"version": "0.2.0",
+	"private": true,
+	"license": "CC-BY-4.0",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/coinspect/wallet-security-testing-dapp.git"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"scripts": {
+		"dev": "vite --port 3000",
+		"build": "vite build",
+		"preview": "vite preview --port 3000",
+		"lint": "eslint .",
+		"test": "node --test test/*.test.mjs",
+		"check:secrets": "node scripts/check-no-secrets.mjs",
+		"refresh:checks": "node scripts/refresh-checks-snapshot.mjs",
+		"compile:token": "node scripts/compile-test-token.mjs",
+		"verify:token": "node scripts/compile-test-token.mjs --check"
+	},
+	"dependencies": {
+		"@reown/appkit": "^1.8.10",
+		"@reown/appkit-adapter-ethers5": "^1.8.10",
+		"buffer": "^6.0.3",
+		"clsx": "^2.1.1",
+		"ethers": "^5.7.2",
+		"lucide-react": "^0.454.0",
+		"react-router": "^7.18.4",
+		"@fontsource-variable/inter": "^5.3.0",
+		"@fontsource-variable/jetbrains-mono": "^5.3.0",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"tailwind-merge": "^2.6.1",
+		"web3": "^4.7.0"
+	},
+	"devDependencies": {
+		"autoprefixer": "^10.4.20",
+		"eslint": "^9.39.5",
+		"@swc/core": "^1.16.13",
+		"@vitejs/plugin-react": "^6.1.1",
+		"vite": "^8.3.2",
+		"eslint-plugin-react": "^7.37.5",
+		"eslint-plugin-react-hooks": "^7.1.1",
+		"eslint-plugin-jsx-a11y": "^6.10.2",
+		"eslint-plugin-import": "^2.32.0",
+		"globals": "^14.0.0",
+		"jsdom": "^26.1.0",
+		"postcss": "^8.4.47",
+		"solc": "0.8.25",
+		"tailwindcss": "^3.4.14"
+	},
+	"overrides": {
+		"@walletconnect/utils": "2.23.7",
+		"@ethersproject/providers": {
+			"ws": "8.21.3"
+		},
+		"solc": {
+			"tmp": "0.2.7"
+		}
+	}
+}
