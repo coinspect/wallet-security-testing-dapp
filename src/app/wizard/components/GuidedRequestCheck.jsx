@@ -75,8 +75,9 @@ export default function GuidedRequestCheck({ step, presentation, platform, prepa
                     <p>{stage.instruction}</p>
                     {stage.checklist && <ul className="list-disc space-y-2 pl-5">{stage.checklist.map((line) => <li key={line}>{line}</li>)}</ul>}
                     {stage.preparation && <fieldset disabled={busy} className="min-w-0">{preparation}</fieldset>}
-                    {stage.links && <ul className="space-y-2">{links.map((link, i) => <li key={link.key}>
-                        <a className="break-all underline underline-offset-4" href={/^https?:\/\//i.test(link.value) ? link.value : `https://${link.value}`} target="_blank" rel="noopener noreferrer">{i + 1}. {link.value}</a>
+                    {stage.links && <ul className="space-y-2">{links.filter((link) => !stage.linkKeys || stage.linkKeys.includes(link.key)).map((link, i) => <li key={link.key}>
+                        <a className="break-all underline underline-offset-4" href={/^https?:\/\//i.test(link.value) ? link.value : `https://${link.value}`} target="_blank" rel="noopener noreferrer">{i + 1}. {link.key === 'unknown_dapp_url' ? 'Open unknown dApp' : link.value}</a>
+                        {link.key === 'unknown_dapp_url' && <p className="break-all text-xs">{link.value}</p>}
                     </li>)}</ul>}
                     {stage.target && <RecipientAddress
                         label={index > actionIndex && run ? "Recipient used in the dApp request" : "Selected recipient"}

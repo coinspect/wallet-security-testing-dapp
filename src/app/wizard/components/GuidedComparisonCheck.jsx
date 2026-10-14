@@ -24,6 +24,7 @@ import { nonSelfTarget } from "@/utils/wallet-methods/addressBoundary.mjs";
 import { TESTER_WALLET_1, TESTER_WALLET_2 } from "@/utils/constants";
 import { SIMPLE_SEND_ACTIONS } from "@/utils/wallet-methods/simpleTransaction.mjs";
 import { normalizeChainId } from "@/utils/wallet-methods/chainId.mjs";
+import { requestChainVerification } from "@/utils/wallet-methods/chainSwitchVerification.mjs";
 import { authConnection, authRecoveryGuard, disconnectForRecovery } from '../utils/authRecovery.mjs';
 
 const linkStyle = "text-sm underline underline-offset-4 text-[var(--wsr-fg-secondary)] disabled:opacity-50";
@@ -81,6 +82,7 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
     const alive = useRef(true);
     const working = useRef(false);
     const activeSwitch = useRef(null);
+    const activeVerification = useRef(null);
     const activeComparison = useRef(null);
     const attempts = useRef([]);
     const diagnosticAttempts = useRef([]);
@@ -109,6 +111,7 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
         return () => {
             alive.current = false;
             activeSwitch.current?.controller.abort();
+            activeVerification.current?.abort();
             activeComparison.current?.controller.abort();
         };
     }, []);
@@ -216,6 +219,37 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
             working.current = false;
             if (alive.current) setBusy(false);
             attempt?.finish();
+        }
+    };
+
+    const verifyNetwork = async (index) => {
+        const original = runs[index];
+        if (working.current || recoveryRef.current || !original?.result?.chainId) return;
+        working.current = true;
+        const controller = new AbortController();
+        activeVerification.current = controller;
+        setBusy(true);
+        setNotice(null);
+        const initial = latest.current;
+        try {
+            const result = await requestChainVerification({
+                provider: initial.provider, address: initial.address, chainId: original.result.chainId,
+                transport: platform === 'mobile' ? 'walletconnect' : 'extension', signal: controller.signal,
+            });
+            if (!alive.current) return;
+            const verification = { ...result,
+                context_changed: !sameGuidedContext(contextOf(initial), contextOf(latest.current), true),
+                same_account_as_switch: initial.address?.toLowerCase() === original.runtime?.from?.toLowerCase(),
+                provider_chain_id_at_dispatch: normalizeChainId(initial.chainId),
+                provider_chain_source: platform === 'mobile' ? 'walletconnect_session_provider' : 'injected_wallet_provider',
+            };
+            const evidence = { ...original.evidence, post_switch_verification: verification };
+            setRuns((previous) => previous.map((entry, i) => i === index ? { ...entry, evidence } : entry));
+            persistEvidenceRecord({ platform, checkId: evidence.check, step: evidence.step, evidence });
+        } finally {
+            activeVerification.current = null;
+            working.current = false;
+            if (alive.current) setBusy(false);
         }
     };
 
@@ -384,7 +418,7 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
                                     {index === 2 && <TestRecipient label="Familiar recipient · reference" address={resolveCheckParams(check.steps[0]).target} onCopy={copyValue} />}
                                     <TestRecipient label={presentation.stages[index].recipientLabel} address={resolveCheckParams(check.steps[index]).target} onCopy={copyValue} />
                                 </>}
-                                {chainGate?.wrong && <ChainGate {...chainGate} />}
+                                {chainGate?.wrong && !(check.canonicalId === 'WSR-PERM-009.v1' && runs[index]?.result?.chainId) && <ChainGate {...chainGate} />}
                                 {recovery ? <div className="space-y-3" aria-live="polite">
                                     <p className="font-medium">{recovery.phase === 'disconnecting' ? 'Saving observations and disconnecting…' : 'Continue after reconnecting'}</p>
                                     {recovery.phase === 'connect' && <>
@@ -409,7 +443,7 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
                                     <CTAButton onClick={() => run(index)} disabled={busy || chainGate?.wrong || (presentation.historySetup && index > 0 && !historyMatches)}>
                                         {busy ? "Waiting for wallet…" : runs[index] ? "Run this request again" : presentation.stages[index].button}
                                     </CTAButton>
-                                    {busy && <CTAButton onClick={() => stopWaiting(index)}>
+                                    {busy && !activeVerification.current && <CTAButton onClick={() => stopWaiting(index)}>
                                         {activeComparison.current?.diagnosticVariant ? 'Stop waiting' : 'Stop waiting and continue'}
                                     </CTAButton>}
                                     {presentation.historySetup && index === 0 ? <CTAButton onClick={confirmHistory} disabled={busy || chainGate?.wrong}>
@@ -421,6 +455,14 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
                                         && (busy || recoverableAttempt.entry) && <CTAButton onClick={() => reconnectAndResume(recoverableAttempt)}>
                                             Reconnect and resume
                                         </CTAButton>}
+                                </div>}
+                                {check.canonicalId === 'WSR-PERM-009.v1' && runs[index]?.result?.chainId && <div className="space-y-3 border-t border-[var(--wsr-border)] pt-3">
+                                    <p>Send a signing request for the target network. Capture the network shown by the wallet, then cancel. The message chain ID alone does not confirm a switch.</p>
+                                    <CTAButton disabled={busy} onClick={() => verifyNetwork(index)}>
+                                        {index === 0 ? 'Send verification request — Ethereum' : 'Send verification request — zkSync Era'}
+                                    </CTAButton>
+                                    {activeVerification.current && <CTAButton onClick={() => activeVerification.current?.abort()}>Stop waiting for verification</CTAButton>}
+                                    <p className="text-xs">Cancel any pending prompt before sending another request. Return to Polygon only before the next switch test.</p>
                                 </div>}
                                 {canReconnect && busy && !recovery && <p className="text-xs text-[var(--wsr-fg-secondary)]">
                                     Connection stuck? Reconnect and resume without resending this request. Cancel any open wallet prompt first.
@@ -492,6 +534,12 @@ export default function GuidedComparisonCheck({ check, presentation, platform, c
                         {runs[index]?.runtime?.connection_attempt && <p className="text-xs text-[var(--wsr-fg-muted)]">Connection {runs[index].runtime.connection_attempt}{runs[index].evidence.resumed_after_reconnecting ? ' · resumed after reconnecting' : ''}</p>}
                         <h3 className="font-semibold">{stage.title}</h3>
                         <p className="text-sm">{presentation.historySetup && index === 0 && !runs[0] && historyConfirmation ? "Existing history confirmed by tester — no setup request sent" : observations[index].title}</p>
+                        {runs[index]?.evidence?.post_switch_verification && <div className="text-sm">
+                            <p>Network verification: {runs[index].evidence.post_switch_verification.message}</p>
+                            <p>Target chain: {runs[index].evidence.post_switch_verification.target_chain_id}. Confirm the displayed network in the wallet screenshot.</p>
+                            {runs[index].evidence.post_switch_verification.context_changed && <p>Connection changed during verification. Repeat with the same wallet.</p>}
+                            {!runs[index].evidence.post_switch_verification.same_account_as_switch && <p>Verification used a different account from the switch request.</p>}
+                        </div>}
                         <ApprovalTokenIdentity token={runs[index]?.approvalToken} />
                         {check.steps[index].ui.content.button.action === "differentChainId" && <TypedDataChainIdentity evidence={runs[index]?.evidence} />}
                         {check.steps[index].ui.content.button.action === "siweSign" && <SiweIdentity run={runs[index]} />}

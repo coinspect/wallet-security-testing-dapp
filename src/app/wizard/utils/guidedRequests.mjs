@@ -12,13 +12,14 @@ const authReview = "Keep the wallet screenshots alongside the responses below. R
 
 export const GUIDED_REQUESTS = {
     "WSR-THRE-001.v1": {
-        objective: "Compare how your wallet identifies this testing dApp and a known dApp.",
-        safety: "Capture both connection dialogs, then reject them. You do not need to grant access.",
+        objective: "Compare how your wallet identifies this testing dApp, an unknown dApp and a known dApp.",
+        safety: "Capture each connection dialog, then cancel. Do not grant access.",
         button: "Request connection",
         stages: [
             { title: "Check this dApp", instruction: "Look for an unknown or unverified label on the connection request. Capture the screen, then cancel.", action: true },
-            { title: "Compare a known dApp", instruction: "Open one of these dApps and request a connection there. Capture any verified or trusted badge, then cancel.", links: true },
-            { title: "Compare the two screens", instruction: "Record whether the wallet distinguished the known dApp from this testing dApp. Keep both screenshots." },
+            { title: "Check the unknown dApp", instruction: "Open the site and request a connection there. Capture the domain and any trust label, then cancel.", links: true, linkKeys: ['unknown_dapp_url'] },
+            { title: "Compare a known dApp", instruction: "Open one of these dApps and request a connection there. Capture any verified or trusted badge, then cancel.", links: true, linkKeys: ['verified_dapp_url', 'aave_dapp_url', 'curve_dapp_url'] },
+            { title: "Compare the screens", instruction: "Record the trust labels shown for each dApp. Keep the screenshots." },
         ],
     },
     "WSR-THRE-003.v1": {

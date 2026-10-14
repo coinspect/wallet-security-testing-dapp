@@ -493,6 +493,7 @@ const RAW_TEST_PARAMS = [
     { key: "scam_dapp_url_8",     group: "URLs & domains", value: "chainbank-network.pages.dev",                        note: "Team-curated phishing list, supplied 2026-08-24; re-verify (domains die fast).", usedBy: ["openScamUrl", "WSR-THRE-003"] },
     { key: "scam_dapp_url_9",     group: "URLs & domains", value: "maga-mem-pages-dev.pages.dev",                       note: "Team-curated phishing list, supplied 2026-08-24; re-verify (domains die fast).", usedBy: ["openScamUrl", "WSR-THRE-003"] },
     { key: "scam_dapp_url_10",    group: "URLs & domains", value: "master--ethereumorg.netlify.app",                   note: "Team-curated phishing list, supplied 2026-08-24; re-verify (domains die fast).", usedBy: ["openScamUrl", "WSR-THRE-003"] },
+    { key: "unknown_dapp_url", group: "URLs & domains", value: "https://this-is-unkown-dappeppy-sorbet-7eca61.netlify.app/", linkLabel: "Open unknown dApp", note: "External test dApp for trust labels and full URL display. Request a connection on that site, then cancel.", usedBy: ["WSR-THRE-001", "WSR-THRE-006"] },
     { key: "verified_dapp_url",   group: "URLs & domains", value: "https://app.uniswap.org", linkLabel: "Uniswap", usedBy: ["WSR-THRE-001", "WSR-PERM-004"] },
     { key: "aave_dapp_url",       group: "URLs & domains", value: "https://app.aave.com",    linkLabel: "Aave",    usedBy: ["WSR-THRE-001"] },
     { key: "curve_dapp_url",      group: "URLs & domains", value: "https://curve.fi",        linkLabel: "Curve",   usedBy: ["WSR-THRE-001"] },
