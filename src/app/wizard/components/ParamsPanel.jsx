@@ -5,7 +5,7 @@ import { Link, useLocation } from "react-router";
 import { Copy, Check, ChevronDown, Eye, ArrowLeft, X } from "lucide-react";
 import { checkBaseFromPath } from "../utils/platform";
 import { paramsForCheck } from "../utils/checkLookup.mjs";
-import { testParams, CHECKS_SNAPSHOT_URL } from "@/utils/constants";
+import { testParams } from "@/utils/constants";
 import wizardConfig from "../config/wizard";
 
 // The FULL value to copy: the structured payload where an entry carries one,
@@ -224,16 +224,6 @@ const ParamsPanel = ({ onOpenChange }) => {
 
                             {/* Footer — pinned OUTSIDE the scroll region. */}
                             <div className="shrink-0 space-y-1 border-t border-gray-200 px-3 py-1.5 dark:border-gray-700">
-                                {CHECKS_SNAPSHOT_URL && (
-                                    <a
-                                        href={CHECKS_SNAPSHOT_URL}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1 text-[0.75rem] text-gray-500 hover:text-gray-700 hover:underline dark:text-gray-400 dark:hover:text-gray-200"
-                                    >
-                                        checks.json snapshot ↗
-                                    </a>
-                                )}
                                 <Link
                                     to="/params"
                                     onClick={() => setOpen(false)}

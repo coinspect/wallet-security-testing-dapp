@@ -1,6 +1,5 @@
 import testTokenArtifact from "@/app/wizard/config/test-token-artifact.json";
 import OPENSEA_EIP712 from "@/api/openSeaEIP_712.json";
-import checksSnapshot from "@/app/wizard/config/checks-snapshot.json";
 import { ethers } from "ethers";
 import {
     buildAddEthereumChain,
@@ -372,24 +371,6 @@ const LABEL_OVERRIDES = {
     uniswap_v3_factory: "Uniswap V3 factory",
     nonfungible_position_manager: "NonfungiblePositionManager",
 };
-
-// SHA-PINNED GitHub blob URL for the vendored checks.json snapshot, built ONCE
-// from the snapshot's own provenance (repo/path + the blob SHA — the pin, never
-// the `main` branch). Single source: the /params page and the params popover
-// both link this; null if provenance is incomplete.
-const _prov = checksSnapshot?._provenance ?? {};
-export const CHECKS_SNAPSHOT_URL = (() => {
-    const [owner, repo, ...path] = String(_prov.source ?? "").split("/");
-    const safeName = (value) => /^[\w.-]+$/.test(value);
-    const safePath = path.length > 0 && path.every((part) => part && part !== ".." && safeName(part));
-    if (
-        !safeName(owner) ||
-        !safeName(repo) ||
-        !safePath ||
-        !/^[0-9a-f]{40}$/.test(String(_prov.blobSha ?? ""))
-    ) return null;
-    return `https://github.com/${owner}/${repo}/blob/${_prov.blobSha}/${path.join("/")}`;
-})();
 
 // Registry group order — the single source consumed by both the in-wizard
 // params panel and the global /params document (no re-declared list).
