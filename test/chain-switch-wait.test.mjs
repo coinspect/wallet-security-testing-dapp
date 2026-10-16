@@ -27,7 +27,7 @@ function wallet(platform) {
             if (args.method === "eth_accounts") return Promise.resolve([account]);
             if (args.method === "eth_chainId") return Promise.resolve("0x89");
             assert.equal(platform, "extension", "WC switching must bypass the SDK's local shortcut");
-            assert.equal(args.method, method);
+            assert([method, 'eth_signTypedData_v4'].includes(args.method));
             return send(args);
         },
     };
@@ -137,7 +137,8 @@ function uiFixture(platform = "mobile", id = "WSR-PERM-009") {
     const check = load("src/app/wizard/config/wizard.json").wizard.checks[id];
     const comparison = load("src/app/wizard/utils/guidedComparison.mjs");
     const Component = load("src/app/wizard/components/GuidedComparisonCheck.jsx").default;
-    const render = () => hooks.render(Component, { check, platform, presentation: comparison.GUIDED_COMPARISONS[check.canonicalId] });
+    const chainGate = { wrong: false };
+    const render = () => hooks.render(Component, { check, platform, chainGate, presentation: comparison.GUIDED_COMPARISONS[check.canonicalId] });
     const button = (label) => nodes(render()).find((node) => node.props?.onClick && node.props.children === label);
     const click = (label) => {
         const node = button(label);
@@ -146,8 +147,48 @@ function uiFixture(platform = "mobile", id = "WSR-PERM-009") {
         return node.props.onClick();
     };
     const phase = () => nodes(render()).filter((node) => node.type === "li").findIndex((node) => node.props["aria-current"] === "step");
-    return { ...f, hooks, check, saved, render, button, click, phase };
+    return { ...f, hooks, check, saved, render, button, click, phase, runtime, chainGate };
 }
+
+for (const platform of ['mobile', 'extension']) test(`${platform}: manual verification preserves the switch result and stays in the same instruction`, async () => {
+    const ui = uiFixture(platform);
+    for (const [index, label, target] of [[0, 'Ethereum', '0x1'], [1, 'zkSync Era', '0x144']]) {
+        const verify = `Send verification request — ${label}`;
+        assert.equal(ui.button(verify), undefined);
+        const switching = ui.click(index === 0 ? 'Switch to Ethereum Mainnet' : 'Switch to zkSync Era');
+        await flush();
+        ui.replies.at(-1).reject({ code: 4001, message: 'User rejected' });
+        await switching;
+        const original = structuredClone(ui.saved.at(-1).evidence);
+        assert.equal(ui.sent.length, index * 2 + 1);
+        ui.chainGate.wrong = true;
+        ui.runtime.chainId = target;
+        const verification = ui.click(verify);
+        await flush();
+        assert.equal(ui.button(verify).props.disabled, true);
+        assert.equal(ui.button('Stop waiting and continue'), undefined);
+        assert.equal(ui.phase(), index);
+        const sent = ui.sent.at(-1);
+        assert.equal((sent.request ?? sent).method, 'eth_signTypedData_v4');
+        if (platform === 'mobile') assert.equal(sent.chainId, `eip155:${BigInt(target)}`);
+        if (index === 0) ui.replies.at(-1).reject({ code: 4001, message: 'User rejected' });
+        else ui.click('Stop waiting for verification');
+        await verification;
+        assert.equal(ui.phase(), index);
+        const evidence = ui.saved.at(-1).evidence;
+        assert.deepEqual(evidence.wallet_output, original.wallet_output);
+        assert.equal(evidence.post_switch_verification.status, index === 0 ? 'cancelled' : 'stopped');
+        assert.equal(evidence.post_switch_verification.same_account_as_switch, true);
+        assert.equal(evidence.automatic_verdict, null);
+        ui.chainGate.wrong = false;
+        ui.runtime.chainId = '0x89';
+        if (index === 0) {
+            const next = ui.button('Continue as inconclusive') ?? ui.button('Continue to the second request');
+            assert(next); next.props.onClick();
+        }
+    }
+    ui.hooks.unmount();
+});
 
 for (const platform of ["mobile", "extension"]) test(`${platform}: the continue button records a neutral stop, advances once and isolates late replies`, async () => {
     const ui = uiFixture(platform), config = JSON.stringify(ui.check);

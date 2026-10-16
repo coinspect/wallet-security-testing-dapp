@@ -2,7 +2,7 @@
 
 import React from 'react';
 import WizardShell from '@/app/wizard/components/WizardShell';
-import { testParams, PARAM_GROUPS, PARAM_GROUP_NOTES, CHECKS_SNAPSHOT_URL } from '@/utils/constants';
+import { testParams, PARAM_GROUPS, PARAM_GROUP_NOTES } from '@/utils/constants';
 import { isParamUsedByStep } from '@/app/wizard/utils/resolveCheckParams';
 import wizardConfig from '@/app/wizard/config/wizard';
 import checksSnapshot from '@/app/wizard/config/checks-snapshot.json';
@@ -61,18 +61,7 @@ const ParamsPage = () => {
                             <div key={label} className='min-w-0'>
                                 <dt className='inline text-stealth-dim'>{label}: </dt>
                                 <dd className='inline break-all text-stealth-muted'>
-                                    {label === 'blobSha' && CHECKS_SNAPSHOT_URL ? (
-                                        <a
-                                            href={CHECKS_SNAPSHOT_URL}
-                                            target='_blank'
-                                            rel='noopener noreferrer'
-                                            className='text-stealth-action hover:underline'
-                                        >
-                                            {value} ↗
-                                        </a>
-                                    ) : (
-                                        value ?? '—'
-                                    )}
+                                    {value ?? '—'}
                                 </dd>
                             </div>
                         ))}
