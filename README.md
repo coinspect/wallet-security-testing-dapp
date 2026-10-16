@@ -1,6 +1,7 @@
 <a href="https://www.coinspect.com/">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="public/coinspect-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="public/coinspect-logo.svg">
     <img src="public/coinspect-logo.svg" alt="Coinspect" width="240">
   </picture>
 </a>
