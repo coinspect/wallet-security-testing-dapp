@@ -18,8 +18,8 @@ test('brand fonts are bundled and every declared face is available', () => {
 
 test('navbar and footer keep WSR primary and Coinspect secondary in both themes', () => {
     const navbar = read('src/components/mainLayout/layoutBar/navBar/NavBar.jsx');
-    assert.match(navbar, /\/brand\/wsr-wordmark.svg/);
-    assert.match(navbar, /Testing<br \/>Tool/);
+    assert.match(navbar, /\/brand\/wsr-wordmark-horizontal.svg/);
+    assert.match(navbar, /whitespace-nowrap[^>]*>Testing Tool/);
     assert.doesNotMatch(navbar, /src="\/coinspect/);
     const logo = read('public/brand/wsr-wordmark.svg').toLowerCase();
     for (const color of ['#85f2e7', '#f25ebf']) assert.ok(logo.includes(color));

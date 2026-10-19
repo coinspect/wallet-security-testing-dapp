@@ -12,7 +12,7 @@ export default function WizardShell({ children }) {
         <div className="min-h-screen overflow-x-hidden bg-stealth-bg text-stealth-fg">
             <NavBar />
             <div
-                className="min-h-screen px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[100px] md:px-8 md:pb-6 md:pt-12"
+                className="min-h-screen px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[132px] md:px-8 md:pb-6 xl:pt-20"
                 data-sentinel="content"
             >
                 {children}
