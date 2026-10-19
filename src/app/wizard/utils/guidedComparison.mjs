@@ -43,7 +43,7 @@ export const GUIDED_COMPARISONS = {
     },
     "WSR-PERM-009.v1": {
         objective: "Check whether your wallet asks before switching networks.",
-        safety: "Start each request on Polygon. Cancel if prompted; a wallet may switch without asking. Return to Polygon before the next request.",
+        safety: "Start each switch test on Polygon. Cancel both the switch and the verification signing prompt. Capture the network shown during verification before returning to Polygon.",
         stages: [
             { title: "Request Ethereum Mainnet", button: "Switch to Ethereum Mainnet", instruction: "Capture whether the wallet asks you to confirm the switch, then cancel." },
             { title: "Request zkSync Era", button: "Switch to zkSync Era", instruction: "Capture the confirmation prompt or the response that the network is not configured (4902). Cancel if prompted." },

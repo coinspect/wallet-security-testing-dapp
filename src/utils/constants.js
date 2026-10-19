@@ -1,6 +1,5 @@
 import testTokenArtifact from "@/app/wizard/config/test-token-artifact.json";
 import OPENSEA_EIP712 from "@/api/openSeaEIP_712.json";
-import checksSnapshot from "@/app/wizard/config/checks-snapshot.json";
 import { ethers } from "ethers";
 import {
     buildAddEthereumChain,
@@ -373,24 +372,6 @@ const LABEL_OVERRIDES = {
     nonfungible_position_manager: "NonfungiblePositionManager",
 };
 
-// SHA-PINNED GitHub blob URL for the vendored checks.json snapshot, built ONCE
-// from the snapshot's own provenance (repo/path + the blob SHA — the pin, never
-// the `main` branch). Single source: the /params page and the params popover
-// both link this; null if provenance is incomplete.
-const _prov = checksSnapshot?._provenance ?? {};
-export const CHECKS_SNAPSHOT_URL = (() => {
-    const [owner, repo, ...path] = String(_prov.source ?? "").split("/");
-    const safeName = (value) => /^[\w.-]+$/.test(value);
-    const safePath = path.length > 0 && path.every((part) => part && part !== ".." && safeName(part));
-    if (
-        !safeName(owner) ||
-        !safeName(repo) ||
-        !safePath ||
-        !/^[0-9a-f]{40}$/.test(String(_prov.blobSha ?? ""))
-    ) return null;
-    return `https://github.com/${owner}/${repo}/blob/${_prov.blobSha}/${path.join("/")}`;
-})();
-
 // Registry group order — the single source consumed by both the in-wizard
 // params panel and the global /params document (no re-declared list).
 export const PARAM_GROUPS = [
@@ -493,6 +474,7 @@ const RAW_TEST_PARAMS = [
     { key: "scam_dapp_url_8",     group: "URLs & domains", value: "chainbank-network.pages.dev",                        note: "Team-curated phishing list, supplied 2026-08-24; re-verify (domains die fast).", usedBy: ["openScamUrl", "WSR-THRE-003"] },
     { key: "scam_dapp_url_9",     group: "URLs & domains", value: "maga-mem-pages-dev.pages.dev",                       note: "Team-curated phishing list, supplied 2026-08-24; re-verify (domains die fast).", usedBy: ["openScamUrl", "WSR-THRE-003"] },
     { key: "scam_dapp_url_10",    group: "URLs & domains", value: "master--ethereumorg.netlify.app",                   note: "Team-curated phishing list, supplied 2026-08-24; re-verify (domains die fast).", usedBy: ["openScamUrl", "WSR-THRE-003"] },
+    { key: "unknown_dapp_url", group: "URLs & domains", value: "https://this-is-unkown-dappeppy-sorbet-7eca61.netlify.app/", linkLabel: "Open unknown dApp", note: "External test dApp for trust labels and full URL display. Request a connection on that site, then cancel.", usedBy: ["WSR-THRE-001", "WSR-THRE-006"] },
     { key: "verified_dapp_url",   group: "URLs & domains", value: "https://app.uniswap.org", linkLabel: "Uniswap", usedBy: ["WSR-THRE-001", "WSR-PERM-004"] },
     { key: "aave_dapp_url",       group: "URLs & domains", value: "https://app.aave.com",    linkLabel: "Aave",    usedBy: ["WSR-THRE-001"] },
     { key: "curve_dapp_url",      group: "URLs & domains", value: "https://curve.fi",        linkLabel: "Curve",   usedBy: ["WSR-THRE-001"] },

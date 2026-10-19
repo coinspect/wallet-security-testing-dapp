@@ -509,12 +509,12 @@
                                         "capture": "Connection screen for the known dApp — done manually"
                                     },
                                     {
-                                        "action": "Reject both connections.",
+                                        "action": "Open the unknown dApp and request a connection there too. Capture each connection dialog, then cancel.",
                                         "expect": "The finding is whether the wallet distinguishes verified from unknown."
                                     }
                                 ],
-                                "links": ["verified_dapp_url", "aave_dapp_url", "curve_dapp_url"],
-                                "linksTitle": "Known dApps to compare",
+                                "links": ["verified_dapp_url", "aave_dapp_url", "curve_dapp_url", "unknown_dapp_url"],
+                                "linksTitle": "dApps to compare",
                                 "images": [],
                                 "button": {
                                     "text": "Request Connection",
@@ -644,7 +644,7 @@
                                         "expect": "Nothing is connected."
                                     }
                                 ],
-                                "links": ["polygon_staking_dapp_url", "polygon_portal_dapp_url", "olympusdao_dapp_url"],
+                                "links": ["polygon_staking_dapp_url", "polygon_portal_dapp_url", "olympusdao_dapp_url", "unknown_dapp_url"],
                                 "linksTitle": "Connect at each dApp",
                                 "images": []
                             }
@@ -1748,8 +1748,8 @@
                                         "capture": "Wallet's response — a confirmation prompt, or the 4902 (unrecognized chain) result"
                                     },
                                     {
-                                        "action": "Cancel each request to stay on your current network.",
-                                        "expect": "The finding is whether the wallet confirms before switching, or blocks a switch to a non-approved network. Nothing switches."
+                                        "action": "After each switch attempt, send the verification request, capture the network shown by the wallet, then cancel.",
+                                        "expect": "Record whether the wallet requested confirmation before switching. The signing response alone does not confirm a network change."
                                     }
                                 ],
                                 "images": [],

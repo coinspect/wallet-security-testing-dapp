@@ -8,6 +8,7 @@ import * as comparison from "../src/app/wizard/utils/guidedComparison.mjs";
 import * as checksum from "../src/app/wizard/utils/checksumComparison.mjs";
 import * as simpleTransaction from "../src/utils/wallet-methods/simpleTransaction.mjs";
 import * as chainId from "../src/utils/wallet-methods/chainId.mjs";
+import * as chainVerification from "../src/utils/wallet-methods/chainSwitchVerification.mjs";
 import * as authRecovery from '../src/app/wizard/utils/authRecovery.mjs';
 import * as responseDetails from '../src/app/wizard/utils/responseDetails.mjs';
 
@@ -51,6 +52,7 @@ function mount(platform, id = "WSR-VERI-001") {
     const presentation = comparison.GUIDED_COMPARISONS[check.canonicalId];
     const originalCheck = JSON.stringify(check);
     const Guided = load("GuidedComparisonCheck", {
+        "@/utils/wallet-methods/chainSwitchVerification.mjs": chainVerification,
         "../utils/responseDetails.mjs": responseDetails,
         react: {
             ...React,
