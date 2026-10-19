@@ -27,7 +27,7 @@ test('social preview metadata is available without JavaScript', () => {
     assert.equal(meta('name', 'twitter:card'), 'summary_large_image');
     assert.equal(meta('property', 'og:image:width'), '1200');
     assert.equal(meta('property', 'og:image:height'), '630');
-    assert.equal(meta('property', 'og:image:alt'), 'Wallet Testing Tool. We test, you decide. Coinspect logo and a wallet connected to a seismograph.');
+    assert.equal(meta('property', 'og:image:alt'), 'Wallet Security Ranking — Testing Tool by Coinspect. A wallet connected to a seismograph.');
     assert.equal(meta('name', 'twitter:image:alt'), meta('property', 'og:image:alt'));
 });
 

@@ -4,7 +4,7 @@ import { socialImageUrl } from './social-preview.mjs';
 
 const html = readFileSync('dist/index.html', 'utf8');
 assert.match(html, /<div id="root"><\/div>/);
-assert.match(html, /Wallet Security Testing dApp/);
+assert.match(html, /Wallet Security Ranking — Testing Tool/);
 assert.match(html, /theme-bootstrap/);
 const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((match) => match[1]);
 assert(assets.some((asset) => asset.endsWith('.js')));

@@ -7,13 +7,13 @@ const themeColors = {
     background: 'rgb(24 24 27)',     
     surface: 'rgb(32 32 35)',        
     border: 'rgb(39 39 42)',         
-    primary: '#4c7bff',              
+    primary: '#85F2E7',
   },
   light: {
     background: '#f9fafb',
     surface: '#ffffff',
     border: '#e5e7eb',
-    primary: '#3b82f6',
+    primary: '#126B63',
   }
 };
 

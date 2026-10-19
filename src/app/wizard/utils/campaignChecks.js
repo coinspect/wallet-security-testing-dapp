@@ -51,5 +51,5 @@ export const checkSortKey = (id) => {
 
 // Celeste (lighter blue) accent for the wallet-only family. One definition,
 // shared by the SVG dots (inline style) and the panel, so they always match.
-export const CELESTE_LIGHT = "#0ea5e9";
-export const CELESTE_DARK = "#7dd3fc";
+export const CELESTE_LIGHT = "#8D246A";
+export const CELESTE_DARK = "#F25EBF";

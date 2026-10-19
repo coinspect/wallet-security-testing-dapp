@@ -65,9 +65,9 @@ const DotTooltip = ({ check, isDarkMode, celeste, titleColor }) => {
                         style={{
                             left: `calc(50% - ${dx}px)`,
                             transform: "translateX(-50%) rotate(45deg)",
-                            background: isDarkMode ? "#1d2133" : "white",
-                            borderLeft: `1px solid ${isDarkMode ? "rgb(76 123 255 / 0.2)" : "#e6e6e6"}`,
-                            borderTop: `1px solid ${isDarkMode ? "rgb(76 123 255 / 0.2)" : "#e6e6e6"}`,
+                            background: isDarkMode ? "#18181B" : "white",
+                            borderLeft: `1px solid ${isDarkMode ? "rgb(133 242 231 / 0.2)" : "#e6e6e6"}`,
+                            borderTop: `1px solid ${isDarkMode ? "rgb(133 242 231 / 0.2)" : "#e6e6e6"}`,
                         }}
                     />
                     {/* Name wraps if long; the versioned id stays on one line in
@@ -106,7 +106,7 @@ const ProgressBar = ({ currentStep, platform = DEFAULT_PLATFORM, contained = tru
 
     const colors = {
         track: isDarkMode ? "rgb(32 32 35)" : "#e5e7eb",
-        progress: isDarkMode ? "#4c7bff" : "#3b82f6",
+        progress: isDarkMode ? "#85F2E7" : "#126B63",
     };
 
     // The URL is the source of truth for the campaign, so every link carries the
@@ -168,7 +168,7 @@ const ProgressBar = ({ currentStep, platform = DEFAULT_PLATFORM, contained = tru
                             const isCurrent = index === currentIndex;
                             const isVisited = currentIndex >= 0 && index <= currentIndex;
                             // Wallet-only checks wear the celeste accent; the rest
-                            // keep the standard blue.
+                            // Keep the campaign accent.
                             const dotColor = c.walletOnly ? celeste : colors.progress;
 
                             return (

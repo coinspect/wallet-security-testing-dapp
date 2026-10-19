@@ -69,7 +69,7 @@ const ConnectWalletButton = ({ wconnect, ready = true }) => {
             ) : wconnect ? (
                 // AppKit owns the WalletConnect button rendering and modal state.
                 <div style={{
-                    '--apkt-tokens-core-backgroundAccentPrimary': '#2563eb',
+                    '--apkt-tokens-core-backgroundAccentPrimary': '#126B63',
                     '--apkt-tokens-theme-textInvert': '#fff',
                     '--apkt-fontFamily-regular': 'var(--font-inter, Inter), system-ui, sans-serif',
                     '--apkt-borderRadius-2': '8px',

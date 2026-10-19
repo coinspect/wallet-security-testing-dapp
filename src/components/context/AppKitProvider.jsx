@@ -46,6 +46,10 @@ try {
         },
         metadata,
         projectId,
+        themeVariables: {
+            '--w3m-accent': '#126B63',
+            '--w3m-font-family': 'WSR Inter, Inter, sans-serif',
+        },
         enableCoinbase: false,
         features: {
             analytics: false,

@@ -7,23 +7,15 @@ import { usePlatform } from '@/app/wizard/context/PlatformContext';
 
 function BrandMark() {
     return (
-        <div aria-label="Coinspect" className="flex min-w-0 items-center gap-1">
+        <div aria-label="Wallet Security Ranking — Testing Tool" className="flex shrink-0 items-center gap-2">
             <img
-                src="/coinspect-logo.svg"
-                alt="Coinspect"
-                width={1000}
-                height={154}
-
-                className="h-4 w-auto shrink-0 dark:hidden md:h-5"
+                src="/brand/wsr-wordmark.svg"
+                alt="Wallet Security Ranking"
+                width={439}
+                height={300}
+                className="h-10 w-auto rounded bg-[#09090B] p-1"
             />
-            <img
-                src="/coinspect-logo-dark.svg"
-                alt="Coinspect"
-                width={1000}
-                height={154}
-
-                className="hidden h-4 w-auto shrink-0 dark:block md:h-5"
-            />
+            <span className="text-xs font-medium leading-tight">Testing<br />Tool</span>
         </div>
     );
 }
