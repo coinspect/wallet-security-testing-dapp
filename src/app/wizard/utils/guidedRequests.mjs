@@ -110,7 +110,7 @@ export const GUIDED_REQUESTS = {
     },
     "WSR-PERM-010~Mobile.v1": {
         objective: "Check whether requests from the wallet's built-in browser require your confirmation.", safety: rejectRequests, button: "Run embedded-browser requests",
-        stages: authStages("Open this page inside your wallet app's built-in browser, connect and unlock the wallet. This test uses the embedded provider, not WalletConnect.", authReview),
+        stages: authStages("Open this page inside your wallet app's built-in browser. Stay in Mobile and use Connect Wallet above to connect the embedded wallet, then unlock it. This check does not use WalletConnect. If your wallet has no built-in browser, skip this check.", authReview),
     },
 };
 

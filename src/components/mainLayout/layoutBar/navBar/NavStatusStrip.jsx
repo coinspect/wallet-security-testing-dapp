@@ -15,7 +15,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 import ParamsPanel from '@/app/wizard/components/ParamsPanel';
-import { usePlatform } from '@/app/wizard/context/PlatformContext';
+import { useActiveTransport } from '@/app/wizard/hooks/useActiveTransport';
 import { useWalletRuntime } from '@/app/wizard/context/WalletRuntimeContext';
 
 /** Detect Apple platforms once at module load so the shortcut hint
@@ -42,8 +42,8 @@ export default function NavStatusStrip() {
     // not during static HTML generation. Hold it back until after hydration so
     // the server and first client tree always match.
     const [hydrated, setHydrated] = React.useState(false);
-    const platform = usePlatform()?.platform;
-    const runtime = useWalletRuntime(platform === 'mobile' ? 'walletconnect' : 'injected');
+    const transport = useActiveTransport();
+    const runtime = useWalletRuntime(transport);
     const chainId = runtime.chainId;
     const displayedChainId = hydrated ? chainId : null;
     // Whether the PARAMS popover is open — while it is, the chip's hover tooltip
