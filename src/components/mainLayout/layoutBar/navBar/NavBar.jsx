@@ -4,6 +4,7 @@ import WalletSelector from '../WalletSelector/WalletSelector';
 import NavControls from '../controls/NavControls';
 import NavStatusStrip from './NavStatusStrip';
 import { usePlatform } from '@/app/wizard/context/PlatformContext';
+import { useActiveTransport } from '@/app/wizard/hooks/useActiveTransport';
 
 function BrandMark() {
     return (
@@ -24,7 +25,8 @@ function BrandMark() {
 /** Compact navigation used only by the standalone wizard and /params. */
 export default function NavBar() {
     const platformCtx = usePlatform();
-    const walletConnect = platformCtx?.platform === 'mobile';
+    const transport = useActiveTransport();
+    const walletConnect = transport === 'walletconnect';
     const platformReady = platformCtx ? platformCtx.ready : true;
 
     return (
@@ -33,7 +35,7 @@ export default function NavBar() {
                 <div className="flex h-20 shrink-0 items-center justify-between gap-2 xl:contents">
                     <BrandMark />
                     <div className="flex min-w-0 items-center justify-end gap-1 xl:order-3 xl:gap-2">
-                        {platformReady && !walletConnect && <WalletSelector />}
+                        {platformReady && transport === 'extension' && <WalletSelector />}
                         <ConnectMetaMaskButton wconnect={walletConnect} ready={platformReady} />
                     </div>
                 </div>
