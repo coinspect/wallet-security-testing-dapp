@@ -9,6 +9,16 @@ import { AppKitButton } from '@reown/appkit/react';
 import { useInjectedWallet, useWalletConnectRuntime } from '@/app/wizard/context/WalletRuntimeContext';
 import { POLYGON_CHAIN_ID } from '@/utils/wallet-methods/polygonPolicy.mjs';
 
+export function ConnectWalletCTA({ onClick }) {
+    return (
+        <button type="button" data-testid="wallet-connect-cta" aria-label="Connect Wallet" onClick={onClick}
+            className="flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-md border border-blue-600 bg-blue-600 px-2 text-xs font-medium text-white transition-colors hover:border-blue-700 hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stealth-action focus-visible:ring-offset-2 focus-visible:ring-offset-stealth-bg md:h-7 md:min-w-0 md:text-[11px]">
+            <Wallet className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Connect Wallet</span>
+        </button>
+    );
+}
+
 /**
  * Wallet chip — touch-sized on mobile, compact on desktop, with an integrated
  * ghost copy affordance. Truncation: `0xABCD…1234`.
@@ -67,9 +77,12 @@ const ConnectWalletButton = ({ wconnect, ready = true }) => {
                     {switching || runtime.networkSetup?.busy ? 'Connecting on Polygon…' : 'Switch to Polygon'}
                 </button>
             ) : wconnect ? (
+                !runtime.address ? (
+                    <ConnectWalletCTA onClick={() => walletConnect.open({ view: 'Connect' })} />
+                ) : (
                 // AppKit owns the WalletConnect button rendering and modal state.
                 <div style={{
-                    '--apkt-tokens-core-backgroundAccentPrimary': '#2563eb',
+                    '--apkt-tokens-core-backgroundAccentPrimary': '#126B63',
                     '--apkt-tokens-theme-textInvert': '#fff',
                     '--apkt-fontFamily-regular': 'var(--font-inter, Inter), system-ui, sans-serif',
                     '--apkt-borderRadius-2': '8px',
@@ -78,6 +91,7 @@ const ConnectWalletButton = ({ wconnect, ready = true }) => {
                 }}>
                     <AppKitButton />
                 </div>
+                )
             ) : (
                 <>
                     {accountsResult ? (
@@ -113,23 +127,12 @@ const ConnectWalletButton = ({ wconnect, ready = true }) => {
                         </button>
                     ) : (
                         <div className="flex flex-col items-end gap-0.5">
-                            <button
-                                data-testid="wallet-connect-cta"
-                                aria-label="Connect extension wallet"
+                            <ConnectWalletCTA
                                 onClick={() => {
                                     setAccountsError(false);
                                     connectToWallet(setAccountsError);
                                 }}
-                                className={cn(
-                                    'flex h-11 min-w-11 items-center justify-center gap-1.5 rounded-lg md:h-7 md:min-w-0 md:rounded-md',
-                                    'border border-blue-600 bg-blue-600 text-white hover:border-blue-700 hover:bg-blue-700',
-                                    'px-2 text-xs md:text-[11px] font-medium',
-                                    'transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stealth-action focus-visible:ring-offset-2 focus-visible:ring-offset-stealth-bg'
-                                )}
-                            >
-                                <Wallet className="h-3.5 w-3.5" />
-                                <span className="md:hidden">Connect</span><span className="hidden md:inline">Connect Ext</span>
-                            </button>
+                            />
                             {accountsError && (
                                 <div
                                     className={cn(

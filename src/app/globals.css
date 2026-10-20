@@ -2,14 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face { font-family: 'WSR Inter'; src: url('/brand/fonts/Inter-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'WSR Inter'; src: url('/brand/fonts/Inter-Medium.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'WSR Inter'; src: url('/brand/fonts/Inter-SemiBold.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'WSR Inter'; src: url('/brand/fonts/Inter-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'WSR Mono'; src: url('/brand/fonts/JetBrainsMono-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'WSR Mono'; src: url('/brand/fonts/JetBrainsMono-Bold.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+
 /*
  * Global CSS is intentionally limited to shared tokens, document defaults and
  * the four animations that cannot be expressed as ordinary Tailwind utilities.
  * Component styling lives with each component in Tailwind classes.
  */
 :root {
-  --font-inter: 'Inter Variable';
-  --font-jetbrains: 'JetBrains Mono Variable';
+  --font-inter: 'WSR Inter';
+  --font-jetbrains: 'WSR Mono';
   --stealth-bg: 248 250 252;
   --stealth-panel: 241 245 249;
   --stealth-surface: 226 232 240;
@@ -43,9 +50,9 @@
   --default-font: var(--default-font-family);
   --monospace-font: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
 
-  --wsr-accent: #3b82f6;
-  --wsr-accent-tint: rgba(59, 130, 246, 0.06);
-  --wsr-celeste: #0ea5e9;
+  --wsr-accent: #126B63;
+  --wsr-accent-tint: rgba(133, 242, 231, 0.12);
+  --wsr-celeste: #8D246A;
   --wsr-card: #ffffff;
   --wsr-border: #e5e7eb;
   --wsr-fg-secondary: #4b5563;
@@ -56,9 +63,9 @@
 }
 
 .dark {
-  --stealth-bg: 8 9 10;
-  --stealth-panel: 13 15 18;
-  --stealth-surface: 18 20 23;
+  --stealth-bg: 9 9 11;
+  --stealth-panel: 24 24 27;
+  --stealth-surface: 24 24 27;
   --stealth-elevated: 26 29 33;
   --stealth-terminal: 28 32 38;
   --stealth-border: 31 36 41;
@@ -66,9 +73,9 @@
   --stealth-muted: 154 164 178;
   --stealth-dim: 107 114 128;
 
-  --wsr-accent: #4c7bff;
-  --wsr-accent-tint: rgba(76, 123, 255, 0.1);
-  --wsr-celeste: #7dd3fc;
+  --wsr-accent: #85F2E7;
+  --wsr-accent-tint: rgba(133, 242, 231, 0.1);
+  --wsr-celeste: #F25EBF;
   --wsr-card: #18181b;
   --wsr-border: #27272a;
   --wsr-fg-secondary: #d1d5db;
@@ -122,11 +129,11 @@ a {
 @keyframes wsr-pulse-hint {
   0%, 100% {
     border-color: rgba(31, 36, 41, 0.5);
-    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    box-shadow: 0 0 0 0 rgba(133, 242, 231, 0);
   }
   50% {
-    border-color: rgba(59, 130, 246, 0.5);
-    box-shadow: 0 0 14px 0 rgba(59, 130, 246, 0.32);
+    border-color: rgba(133, 242, 231, 0.5);
+    box-shadow: 0 0 14px 0 rgba(133, 242, 231, 0.32);
   }
 }
 

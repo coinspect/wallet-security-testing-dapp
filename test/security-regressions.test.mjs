@@ -117,7 +117,7 @@ test("the batch retains every remaining method; recovery controls the pause rath
 });
 
 test("the static entry publishes metadata and bootstraps theme before the application", () => {
-    assert.match(ROOT_LAYOUT_SRC, /<title>Wallet Security Testing dApp<\/title>/);
+    assert.match(ROOT_LAYOUT_SRC, /<title>Wallet Security Ranking — Testing Tool<\/title>/);
     assert.match(ROOT_LAYOUT_SRC, /name="description" content="Standalone testing wizard for the Wallet Security Ranking\."/);
     assert.match(ROOT_LAYOUT_SRC, /<script id="theme-bootstrap">/);
     assert(ROOT_LAYOUT_SRC.indexOf('theme-bootstrap') < ROOT_LAYOUT_SRC.indexOf('/src/main.jsx'));

@@ -12,6 +12,8 @@ module.exports = {
         mono: ['var(--font-jetbrains)', 'JetBrains Mono', 'ui-monospace', 'monospace'],
       },
       colors: {
+        // Existing utility names share the WSR palette; darker shades retain light-theme contrast.
+        blue: { 50: '#F0FDFA', 100: '#CCFBF1', 200: '#B4F7EF', 300: '#A0F5EC', 400: '#85F2E7', 500: '#187D73', 600: '#126B63', 700: '#0D554F', 800: '#10443F', 900: '#103A36' },
         // Wizard surface tokens used by the navigator and image viewer.
         dark: {
           base: 'rgb(24 24 27)',
@@ -20,15 +22,15 @@ module.exports = {
         },
         background: {
           light: '#f9fafb',
-          dark: '#141625'
+          dark: '#09090B'
         },
         surface: {
           light: '#ffffff',
-          dark: '#1e2139'
+          dark: '#18181B'
         },
         primary: {
-          light: '#3b82f6',
-          dark: '#4c7bff'
+          light: '#126B63',
+          dark: '#85F2E7'
         },
 
         // Theme-aware wizard palette.
@@ -46,12 +48,12 @@ module.exports = {
           muted:    'rgb(var(--stealth-muted) / <alpha-value>)',
           dim:      'rgb(var(--stealth-dim) / <alpha-value>)',
           // Brand colours — static across themes.
-          action: '#3B82F6',     // cobalt — primary CTA
+          action: '#126B63',
           actionFg: '#FFFFFF',
-          accent: '#10B981',     // emerald — success
+          accent: '#36C497',
           accentFg: '#04241A',
-          warn: '#F59E0B',
-          danger: '#EF4444',
+          warn: '#EAB219',
+          danger: '#FA4A89',
         },
 
         // ===== Shadcn HSL tokens (driven by CSS variables in globals.css) =====

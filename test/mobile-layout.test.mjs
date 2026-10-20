@@ -117,7 +117,7 @@ test("responsive presentation never auto-selects a campaign or changes a request
         assert.doesNotMatch(source(path), /matchMedia|userAgent|handleAction|provider\.request/);
     }
     const shell = source(componentPath("WizardShell"));
-    assert.match(shell, /pt-\[100px\].*md:pt-12/);
+    assert.match(shell, /pt-\[132px\].*xl:pt-20/);
     assert.match(shell, /safe-area-inset-bottom/);
     assert.match(source(componentPath("ProgressBar")), /hidden h-7.*lg:block/);
     assert.doesNotMatch(source("components/mainLayout/layoutBar/navBar/NavStatusStrip.jsx"), /relative hidden md:inline-flex/);

@@ -27,7 +27,7 @@ const CheckIndexPanel = ({ checks, currentIndex, platform = DEFAULT_PLATFORM }) 
     const { isDarkMode } = useTheme();
     const rootRef = useRef(null);
     const celeste = isDarkMode ? CELESTE_DARK : CELESTE_LIGHT;
-    const blue = isDarkMode ? "#4c7bff" : "#3b82f6";
+    const blue = isDarkMode ? "#85F2E7" : "#126B63";
 
     // Esc + click-outside close, only wired while the panel is open.
     useEffect(() => {
