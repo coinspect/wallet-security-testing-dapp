@@ -23,7 +23,7 @@
 	},
 	"dependencies": {
 		"@reown/appkit": "^1.8.10",
-		"@reown/appkit-adapter-ethers5": "^1.8.10",
+		"@reown/appkit-adapter-ethers5": "^1.8.24",
 		"buffer": "^6.0.3",
 		"clsx": "^2.1.1",
 		"ethers": "^5.7.2",
