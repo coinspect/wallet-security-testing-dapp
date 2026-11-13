@@ -221,6 +221,7 @@ export const SWAP_ROUTER_02 = "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45";
 export const QUOTER_V2 = "0x61fFE014bA17989E743c5F6cB21bF9697530B21e";
 export const WMATIC = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
 export const USDC_E = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+export const DUPLICATE_USDC_E_ADDRESS = "0xF22b74Fd841FB9124730e7777ed785A162283297";
 export const SWAP_FEE = 500;
 export const SWAP_AMOUNT_IN = "10000000000000000"; // 0.01 MATIC (wei)
 
@@ -516,7 +517,8 @@ const RAW_TEST_PARAMS = [
     { key: "swap_router_02",       group: "Contracts & tokens", value: SWAP_ROUTER_02, usedBy: ["simulateSwap"] },
     { key: "quoter_v2",            group: "Contracts & tokens", value: QUOTER_V2, usedBy: ["simulateSwap"] },
     { key: "wmatic",               group: "Contracts & tokens", value: WMATIC, usedBy: ["simulateSwap", "provideLiquidity"] },
-    { key: "usdc_e",               group: "Contracts & tokens", value: USDC_E, note: "VERI-005 p2 approves this token (a standard ERC-20 approve to APPROVE_SPENDER, unlimited); also the simulateSwap output token.", usedBy: ["simulateSwap", "approveTestErc20"] },
+    { key: "usdc_e",               group: "Contracts & tokens", value: USDC_E, note: "VERI-005 approves this token (a standard ERC-20 approve to APPROVE_SPENDER, unlimited); also the simulateSwap output token.", usedBy: ["simulateSwap", "approveTestErc20"] },
+    { key: "duplicate_usdc_e", group: "Contracts & tokens", value: DUPLICATE_USDC_E_ADDRESS, note: "VERI-005 test duplicate: identical USDC.e metadata, different contract and zero supply. Cancel the approval request.", usedBy: ["approveTestErc20"] },
     { key: "uniswap_v3_factory",   group: "Contracts & tokens", value: UNISWAP_V3_FACTORY, usedBy: ["provideLiquidity", "simulateSwap"] },
     { key: "nonfungible_position_manager", group: "Contracts & tokens", value: NONFUNGIBLE_POSITION_MANAGER, usedBy: ["provideLiquidity"] },
 

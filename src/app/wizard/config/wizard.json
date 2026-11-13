@@ -2122,12 +2122,17 @@
                                         "capture": "Wallet's approval dialog for the KNOWN token (USDC.e): token, spender and amount"
                                     },
                                     {
+                                        "action": "Request the test duplicate approval, capture the dialog, then cancel.",
+                                        "expect": "The same unlimited approval for a different contract with identical name, symbol and decimals. This is a test duplicate, not USDC.e.",
+                                        "capture": "Test duplicate approval dialog, including the contract address and any warnings"
+                                    },
+                                    {
                                         "action": "Click Approve WSRT, then reject it.",
                                         "expect": "The same unlimited approval opens, but for WSRT \u2014 a token the wallet has no metadata for. Compare how the wallet renders this UNKNOWN token against USDC.e.",
                                         "capture": "Wallet's approval dialog for the UNKNOWN token (WSRT)"
                                     },
                                     {
-                                        "action": "Reject both approvals.",
+                                        "action": "Cancel all three approvals. Do not approve or sign.",
                                         "expect": "The finding is whether the wallet shows token, spender and amount clearly \u2014 and whether a known and an unknown token are rendered differently. Nothing is approved, and no gas is spent."
                                     }
                                 ],
@@ -2155,6 +2160,56 @@
                         }
                     },
                     {
+                        "id": "WSR-VERI-005-duplicate",
+                        "canonicalId": "WSR-VERI-005.v1",
+                        "actionLabel": "Review USDC.e metadata duplicate (test)",
+                        "metadata": {
+                            "estimatedTime": "1min"
+                        },
+                        "config": {
+                            "isRequired": true,
+                            "order": 16,
+                            "status": "pending",
+                            "type": "intended-action-verification"
+                        },
+                        "validation": {
+                            "rules": [
+                                "requireAuthentication"
+                            ],
+                            "customValidation": null
+                        },
+                        "ui": {
+                            "icon": "FileSearch",
+                            "theme": "default",
+                            "layout": "standard",
+                            "content": {
+                                "bulletPointsTitle": "How to Test",
+                                "steps": [],
+                                "images": [],
+                                "button": {
+                                    "text": "Review test duplicate approval",
+                                    "loadingText": "Verifying...",
+                                    "action": "approveTestErc20"
+                                },
+                                "successMessage": "Approval request sent — capture the approval dialog.",
+                                "errorMessage": "Approval request failed."
+                            }
+                        },
+                        "data": {
+                            "fields": [
+                                "authResult"
+                            ],
+                            "initialValues": {
+                                "authResult": null
+                            },
+                            "dependencies": [],
+                            "params": {
+                                "chain": "polygon",
+                                "tokenAddress": "0xF22b74Fd841FB9124730e7777ed785A162283297"
+                            }
+                        }
+                    },
+                    {
                         "id": "WSR-VERI-005-2",
                         "canonicalId": "WSR-VERI-005.v1",
                         "actionLabel": "Approve WSRT (unknown token)",
@@ -2163,7 +2218,7 @@
                         },
                         "config": {
                             "isRequired": true,
-                            "order": 16,
+                            "order": 17,
                             "status": "pending",
                             "type": "intended-action-verification"
                         },

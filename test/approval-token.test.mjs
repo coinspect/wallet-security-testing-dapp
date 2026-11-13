@@ -18,7 +18,7 @@ function load(path, overrides = {}) {
 }
 // Read the actual address constants without the rest of the application's SDKs.
 const source = read("src/utils/constants.js");
-const constants = Object.fromEntries(["TEST_ERC20_ADDRESS", "USDC_E"].map((key) => [key, JSON.parse(source.match(new RegExp(`export const ${key} = ([^;]+);`))[1])]));
+const constants = Object.fromEntries(["TEST_ERC20_ADDRESS", "USDC_E", "DUPLICATE_USDC_E_ADDRESS"].map((key) => [key, JSON.parse(source.match(new RegExp(`export const ${key} = ([^;]+);`))[1])]));
 const { approvalTokenForStep } = load("src/app/wizard/utils/approvalToken.js", { "@/utils/constants": constants });
 const Identity = load("src/app/wizard/components/ApprovalTokenIdentity.jsx").default;
 const check = JSON.parse(read("src/app/wizard/config/wizard.json")).wizard.checks["WSR-VERI-005"];
@@ -27,6 +27,7 @@ test("approval identities use the actual configured contracts without changing r
     const before = JSON.stringify(check);
     assert.deepEqual(check.steps.map(approvalTokenForStep), [
         { name: "USDC.e", address: constants.USDC_E },
+        { name: "USDC.e metadata duplicate (test)", address: constants.DUPLICATE_USDC_E_ADDRESS },
         { name: "WSR Test Token (WSRT)", address: constants.TEST_ERC20_ADDRESS },
     ]);
     assert.equal(JSON.stringify(check), before);
