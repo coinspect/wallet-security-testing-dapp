@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { ethers } from "ethers";
 import { inspectEthSignSignature } from "../src/utils/wallet-methods/ethSignVerification.mjs";
-import { Web3 } from "web3";
 import { sanitizeEvidenceForStorage } from "../src/app/wizard/utils/evidenceStorage.mjs";
 import { compareChecksumDisplay, checksumComparisonSummary, visibleChecksumInput } from "../src/app/wizard/utils/checksumComparison.mjs";
 import { nonSelfTarget, resolveTargetAddress } from "../src/utils/wallet-methods/addressBoundary.mjs";
@@ -216,7 +215,7 @@ function signingFixture(rejection = null, rawSigner = null) {
         send(method, params) { return this.provider.request({ method, params }); }
     } } };
     const bindings = {
-        ...messages, ethers: mockEthers, Web3, getActiveProvider: () => wallet,
+        ...messages, ethers: mockEthers, getActiveProvider: () => wallet,
         buildSiweMismatchMessage: (address, options) => messages.buildSiweMismatchMessage(address, { ...siweFields, ...options }),
         snapshotError, inspectEthSignSignature,
         EIP_712: typedDataTemplate, DIFFERENT_CHAIN_ID: mismatchedChainId,
@@ -271,8 +270,7 @@ for (const platform of ["extension", "mobile"]) {
             await previous.dispatch(platform, s.ui.content.button.action, previous.wallet, platform === "mobile" ? { __wcChainId: "0x89" } : {});
             const run = await runComparisonStep({ platform, step: s, runtime: { ...runtime, provider: guided.wallet }, dispatch: guided.dispatch });
             assert.equal(run.error, undefined, JSON.stringify(run));
-            // Web3 assigns a fresh correlation id; compare the actual method
-            // and all payload params, including the complete encoded message.
+            // Compare the method and params, including the complete encoded message.
             const payloads = (requests) => requests.map(({ method, params }) => ({ method, params }));
             assert.deepEqual(payloads(guided.sent), payloads(previous.sent));
             assert.deepEqual(guided.verificationCalls, previous.verificationCalls);
@@ -284,6 +282,10 @@ for (const platform of ["extension", "mobile"]) {
                 assert.match(message, /opensea\.io wants you to sign in/);
                 assert.match(message, /URI: https:\/\/opensea\.io/);
                 assert.equal(message, messages.buildSiweMismatchMessage(ACCOUNT, siweFields));
+                assert.equal(guided.sent[0].params[1], ACCOUNT);
+                if (platform === "extension") {
+                    assert.deepEqual(guided.sent[0].params, [ethers.utils.hexlify(ethers.utils.toUtf8Bytes(message)), ACCOUNT, ""]);
+                }
                 assert.match(message, /Chain ID: 137\nNonce: 545216abcd123456\nIssued At: 2026-09-17T00:00:00.000Z/);
                 assert.equal(run.runtime.siwe_message, message);
             } else {
@@ -309,8 +311,7 @@ for (const platform of ["extension", "mobile"]) {
                 const run = await runComparisonStep({ platform, step: s, runtime: { ...runtime, provider: mock.wallet }, dispatch: mock.dispatch });
                 assert.equal(mock.sent.length, 1);
                 assert.equal(mock.verificationCalls.length, 0);
-                assert.equal(run.error.message, platform === "extension" && id === "WSR-PERM-001"
-                    ? `Returned error: ${rejection.message}` : rejection.message);
+                assert.equal(run.error.message, rejection.message);
                 const observation = comparisonObservation(run, { method, expectedOutcome: s.expectedOutcome });
                 assert.equal(observation.cancelled, true);
                 assert.equal(observation.returnedValue, undefined);

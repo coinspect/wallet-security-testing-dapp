@@ -23,7 +23,6 @@ import {
     USDC_E,
     WMATIC,
 } from "@/utils/constants";
-import Web3 from "web3";
 import { buildSiweMismatchMessage, siweMessageRuntime } from "@/utils/signMessages";
 import { snapshotError } from "../requestDiagnostics.mjs";
 import { ethers } from "ethers";
@@ -117,9 +116,7 @@ export const sendTypedData = async (address, differentChainId = false, version =
 
 export const ethSign = async (address, provider) => {
     try {
-        const web3 = new Web3(provider);
-
-        const messageHash = web3.utils.keccak256(PERSONAL_SIGN);
+        const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(PERSONAL_SIGN));
 
         if (messageHash.length !== 66) {
             throw new Error("Invalid hash length");
@@ -139,7 +136,6 @@ export const ethSign = async (address, provider) => {
 export const signInWithEthereum = async (provider) => {
     let runtime;
     try {
-        const web3 = new Web3(provider);
         const [address] = await provider.request({ method: "eth_accounts" });
         if (!address) {
             throw new Error("No Ethereum accounts found.");
@@ -147,10 +143,10 @@ export const signInWithEthereum = async (provider) => {
 
         const message = buildSiweMismatchMessage(address);
         runtime = { from: address, ...siweMessageRuntime(message), siwe_request: {
-            method: "personal_sign", params: [web3.utils.utf8ToHex(message), address, ""],
+            method: "personal_sign", params: [ethers.utils.hexlify(ethers.utils.toUtf8Bytes(message)), address, ""],
         } };
 
-        const signature = await web3.eth.personal.sign(message, address, "");
+        const signature = await provider.request(runtime.siwe_request);
         return { result: signature, runtime };
     } catch (error) {
         console.error("Error signing in with Ethereum:", error);
