@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { ethers } from "ethers";
 import { inspectEthSignSignature } from "../src/utils/wallet-methods/ethSignVerification.mjs";
-import { Web3 } from "web3";
 import { sanitizeEvidenceForStorage } from "../src/app/wizard/utils/evidenceStorage.mjs";
 import { compareChecksumDisplay, checksumComparisonSummary, visibleChecksumInput } from "../src/app/wizard/utils/checksumComparison.mjs";
 import { nonSelfTarget, resolveTargetAddress } from "../src/utils/wallet-methods/addressBoundary.mjs";
@@ -28,7 +27,7 @@ test("guided presentation is limited to nine reviewed checks, preserving configu
     assert.deepEqual(Object.keys(GUIDED_COMPARISONS).sort(), ["WSR-PERM-001.v1", "WSR-PERM-003.v1", "WSR-PERM-006.v1", "WSR-PERM-009.v1", "WSR-THRE-002.v2", "WSR-VERI-001.v1", "WSR-VERI-002.v1", "WSR-VERI-003.v1", "WSR-VERI-005.v1"]);
     for (const [id, actions, params] of [
         ["WSR-VERI-001", ["sendInvalidChecksumTransaction"], [{ target: "checksumProbeBadChecksum", chain: "polygon" }]],
-        ["WSR-VERI-005", ["approveTestErc20", "approveTestErc20"], [{ chain: "polygon" }, { chain: "polygon", useTestToken: true }]],
+        ["WSR-VERI-005", ["approveTestErc20", "approveTestErc20", "approveTestErc20"], [{ chain: "polygon" }, { chain: "polygon", tokenAddress: "0xF22b74Fd841FB9124730e7777ed785A162283297" }, { chain: "polygon", useTestToken: true }]],
         ["WSR-VERI-003", ["provideLiquidity", "simulateSwap"], [{ chain: "polygon" }, { chain: "polygon" }]],
         ["WSR-THRE-002", ["sendFamiliarRecipientTransaction", "sendScamTransaction", "sendPoisonTransaction"], [
             { target: "familiarRecipient", chain: "polygon" }, { target: "scamAddress", chain: "polygon" }, { target: "poisonAddress", chain: "polygon" },
@@ -216,7 +215,7 @@ function signingFixture(rejection = null, rawSigner = null) {
         send(method, params) { return this.provider.request({ method, params }); }
     } } };
     const bindings = {
-        ...messages, ethers: mockEthers, Web3, getActiveProvider: () => wallet,
+        ...messages, ethers: mockEthers, getActiveProvider: () => wallet,
         buildSiweMismatchMessage: (address, options) => messages.buildSiweMismatchMessage(address, { ...siweFields, ...options }),
         snapshotError, inspectEthSignSignature,
         EIP_712: typedDataTemplate, DIFFERENT_CHAIN_ID: mismatchedChainId,
@@ -271,8 +270,7 @@ for (const platform of ["extension", "mobile"]) {
             await previous.dispatch(platform, s.ui.content.button.action, previous.wallet, platform === "mobile" ? { __wcChainId: "0x89" } : {});
             const run = await runComparisonStep({ platform, step: s, runtime: { ...runtime, provider: guided.wallet }, dispatch: guided.dispatch });
             assert.equal(run.error, undefined, JSON.stringify(run));
-            // Web3 assigns a fresh correlation id; compare the actual method
-            // and all payload params, including the complete encoded message.
+            // Compare the method and params, including the complete encoded message.
             const payloads = (requests) => requests.map(({ method, params }) => ({ method, params }));
             assert.deepEqual(payloads(guided.sent), payloads(previous.sent));
             assert.deepEqual(guided.verificationCalls, previous.verificationCalls);
@@ -284,6 +282,10 @@ for (const platform of ["extension", "mobile"]) {
                 assert.match(message, /opensea\.io wants you to sign in/);
                 assert.match(message, /URI: https:\/\/opensea\.io/);
                 assert.equal(message, messages.buildSiweMismatchMessage(ACCOUNT, siweFields));
+                assert.equal(guided.sent[0].params[1], ACCOUNT);
+                if (platform === "extension") {
+                    assert.deepEqual(guided.sent[0].params, [ethers.utils.hexlify(ethers.utils.toUtf8Bytes(message)), ACCOUNT, ""]);
+                }
                 assert.match(message, /Chain ID: 137\nNonce: 545216abcd123456\nIssued At: 2026-09-17T00:00:00.000Z/);
                 assert.equal(run.runtime.siwe_message, message);
             } else {
@@ -309,8 +311,7 @@ for (const platform of ["extension", "mobile"]) {
                 const run = await runComparisonStep({ platform, step: s, runtime: { ...runtime, provider: mock.wallet }, dispatch: mock.dispatch });
                 assert.equal(mock.sent.length, 1);
                 assert.equal(mock.verificationCalls.length, 0);
-                assert.equal(run.error.message, platform === "extension" && id === "WSR-PERM-001"
-                    ? `Returned error: ${rejection.message}` : rejection.message);
+                assert.equal(run.error.message, rejection.message);
                 const observation = comparisonObservation(run, { method, expectedOutcome: s.expectedOutcome });
                 assert.equal(observation.cancelled, true);
                 assert.equal(observation.returnedValue, undefined);
@@ -325,7 +326,7 @@ for (const platform of ["extension", "mobile"]) {
 }
 
 const constants = Object.fromEntries([
-    "APPROVE_AMOUNT", "APPROVE_SPENDER", "TEST_ERC20_ADDRESS", "USDC_E", "WMATIC", "SWAP_FEE", "SWAP_AMOUNT_IN",
+    "APPROVE_AMOUNT", "APPROVE_SPENDER", "TEST_ERC20_ADDRESS", "USDC_E", "DUPLICATE_USDC_E_ADDRESS", "WMATIC", "SWAP_FEE", "SWAP_AMOUNT_IN",
     "LP_AMOUNT_IN", "LP_TICK_SPACING", "SWAP_ROUTER_02", "QUOTER_V2", "UNISWAP_V3_FACTORY", "NONFUNGIBLE_POSITION_MANAGER",
     "TESTER_WALLET_1", "TESTER_WALLET_2",
 ].map((name) => {
@@ -733,7 +734,7 @@ for (const platform of ["extension", "mobile"]) {
                 assert.equal(evidence.request_outcome, "cancelled_by_tester");
                 assert.equal(evidence.automatic_verdict, null);
             }
-            assert.equal(sent.length, 2);
+            assert.equal(sent.length, checks[id].steps.length);
         });
         test(`${id} ${platform}: guided dispatch preserves the previous ordered transaction payloads byte-for-byte`, async () => {
             const previous = fixture();
@@ -744,13 +745,15 @@ for (const platform of ["extension", "mobile"]) {
                 const run = await runComparisonStep({ platform, step: s, runtime: { ...runtime, provider: guided.wallet }, identity: { name: "Mock extension" }, dispatch: guided.dispatch });
                 assert.equal(run.result?.status, "rejected_by_user", JSON.stringify(run));
             }
-            assert.equal(guided.sent.length, 2);
+            assert.equal(guided.sent.length, checks[id].steps.length);
             assert.deepEqual(guided.sent, previous.sent);
             const txs = guided.sent.map((request) => request.params[0]);
             assert(txs.every((tx) => tx.from === ACCOUNT));
             if (id === "WSR-VERI-005") {
                 assert.equal(txs[0].to, constants.USDC_E);
-                assert.equal(txs[1].to, constants.TEST_ERC20_ADDRESS);
+                assert.equal(txs[1].to, constants.DUPLICATE_USDC_E_ADDRESS);
+                assert.equal(txs[2].to, constants.TEST_ERC20_ADDRESS);
+                assert.equal(txs[0].data, txs[2].data);
                 assert.equal(txs[0].data, txs[1].data);
                 const decoded = new ethers.utils.Interface(constants.TEST_ERC20_ABI).decodeFunctionData("approve", txs[0].data);
                 assert.equal(decoded[0], constants.APPROVE_SPENDER);

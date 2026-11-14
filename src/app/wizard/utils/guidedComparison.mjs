@@ -64,13 +64,14 @@ export const GUIDED_COMPARISONS = {
         review: "Open your wallet's own send screen and type this address by hand, preserving its exact letter case. Capture any warning, block or correction, then cancel. Do not send this second transaction.",
     },
     "WSR-VERI-005.v1": {
-        objective: "Compare how your wallet displays an approval for a known token and an unknown token.",
-        safety: "Use a dedicated test wallet. These are real mainnet requests: capture the wallet screen and reject both. Do not approve or sign.",
+        objective: "Compare approvals for USDC.e, a test duplicate with identical metadata, and WSRT.",
+        safety: "Use a dedicated test wallet. These are real mainnet requests: capture each wallet screen and cancel all three requests. Do not approve or sign.",
         stages: [
             { title: "Review the known token", button: "Review USDC.e approval", instruction: "Look for the token, spender and approved amount. Capture the approval screen, then reject the request." },
-            { title: "Review the unknown token", button: "Review WSRT approval", instruction: "Look for the same details for the unknown token. Capture the approval screen, then reject the request." },
+            { title: "Review the test duplicate", button: "Review test duplicate approval", instruction: "This test contract copies USDC.e metadata but is not USDC.e. Check the contract address and any warnings. Capture the screen, then cancel the request." },
+            { title: "Review the custom token", button: "Review WSRT approval", instruction: "Look for the same details for WSRT. Capture the approval screen, then cancel the request." },
         ],
-        review: "Compare both screenshots: does each dialog identify the approval, token, spender and amount? Note any difference between the known and unknown token.",
+        review: "Compare all three screenshots: check the token, contract address, spender, amount and any warnings. An absent warning alone does not establish a failure.",
     },
     "WSR-VERI-003.v1": {
         objective: "Check whether your wallet previews what you spend and receive before signing a liquidity provision and a swap.",

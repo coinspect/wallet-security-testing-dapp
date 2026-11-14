@@ -1,4 +1,4 @@
-import { TEST_ERC20_ADDRESS, USDC_E } from "@/utils/constants";
+import { TEST_ERC20_ADDRESS, USDC_E, DUPLICATE_USDC_E_ADDRESS } from "@/utils/constants";
 
 // Presentation-only identity from the check configuration, not wallet metadata.
 // Keep the same selection precedence as approveTestErc20 and its two transports.
@@ -9,6 +9,7 @@ export function approvalTokenForStep(step) {
     if (typeof address !== "string") return null;
     const name = address.toLowerCase() === USDC_E.toLowerCase() ? "USDC.e"
         : address.toLowerCase() === TEST_ERC20_ADDRESS.toLowerCase() ? "WSR Test Token (WSRT)"
+        : address.toLowerCase() === DUPLICATE_USDC_E_ADDRESS.toLowerCase() ? "USDC.e metadata duplicate (test)"
         : "Custom token";
     return { name, address };
 }
