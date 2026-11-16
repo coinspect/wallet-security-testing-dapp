@@ -12,6 +12,7 @@ import EvidencePanel from "../../components/EvidencePanel";
 import MultiShotPanel from "../../components/MultiShotPanel";
 import ConnectedDappCheck from "../../components/ConnectedDappCheck";
 import GuidedComparisonCheck from "../../components/GuidedComparisonCheck";
+import ChainSwitchCheck from "../../components/ChainSwitchCheck";
 import GuidedRequestCheck from "../../components/GuidedRequestCheck";
 import { GUIDED_REQUESTS } from "../../utils/guidedRequests.mjs";
 import { GUIDED_COMPARISONS } from "../../utils/guidedComparison.mjs";
@@ -468,6 +469,8 @@ export default function StepPage() {
                 the header shares; two-column checks use the wide grid. */}
             {currentCheck.presentation === "connection-management" ? (
                 <ConnectedDappCheck key={`${step}:${platform}`} check={currentCheck} platform={platform} />
+            ) : currentCheck.canonicalId === 'WSR-PERM-009.v1' ? (
+                <ChainSwitchCheck key={`${step}:${platform}`} check={currentCheck} platform={platform} />
             ) : guidedComparison ? (
                 <GuidedComparisonCheck key={`${step}:${platform}`} check={currentCheck} presentation={guidedComparison} platform={platform} chainGate={chainGate} />
             ) : guidedRequest ? (

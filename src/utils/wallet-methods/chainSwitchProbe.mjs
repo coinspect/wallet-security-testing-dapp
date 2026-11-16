@@ -61,13 +61,14 @@ async function readChain(provider, source, timeoutMs) {
 
 // PERM-009 only. Never use UniversalProvider.request for the switch: it can
 // change an approved chain locally without ever contacting the wallet.
-export async function requestChainSwitch({ provider, chainId, chainName, transport, readTimeoutMs = 2000, signal }) {
+export async function requestChainSwitch({ provider, chainId, chainName, transport, readTimeoutMs = 2000, signal, requirePolygon = true }) {
     const mobile = transport === "walletconnect";
     const request = { method: METHOD, params: [{ chainId }] };
     const result = {
         at: "chain_switch", chainId, chainName, request,
         request_path: mobile ? "walletconnect_sign_client" : "injected_provider",
         request_submitted: false,
+        ...(mobile ? { active_chain_limitation: "WalletConnect chain reads describe the session provider, not a unique active network in the wallet." } : {}),
     };
     const notSent = (reason) => ({ ...result, status: "switch_not_sent", reason });
     const stopped = (stage) => ({ ...result, status: result.status ?? "switch_stopped_waiting", wait_stopped: { source: "tester", stage } });
@@ -93,9 +94,8 @@ export async function requestChainSwitch({ provider, chainId, chainName, transpo
         if (error === REQUEST_WAIT_STOPPED) return stopped("chain_before");
         throw error;
     }
-    if (!result.chain_before.chain_id) return notSent("chain_read_failed");
-    if (result.chain_before.chain_id !== POLYGON_CHAIN_ID) return notSent("polygon_required");
-    if (result.chain_before.chain_id === normalizeChainId(chainId)) return { ...result, status: "switch_already_selected" };
+    if (!result.chain_before.chain_id && (mobile || requirePolygon)) return notSent("chain_read_failed");
+    if (requirePolygon && result.chain_before.chain_id !== POLYGON_CHAIN_ID) return notSent("polygon_required");
     if (mobile) {
         const live = provider.session ?? provider.signer?.session;
         if (live?.topic !== session.topic) return notSent("session_changed");
