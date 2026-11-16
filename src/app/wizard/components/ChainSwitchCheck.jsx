@@ -19,7 +19,19 @@ const usesWalletConnect = (record) => record.runtime?.transport === 'walletconne
 const unknown = 'Not determined';
 const field = 'w-full rounded border border-[var(--wsr-border)] bg-[var(--wsr-bg)] p-2 text-sm';
 const card = 'space-y-3 rounded-lg border border-[var(--wsr-border)] bg-[var(--wsr-card)] p-4';
-const readLabel = (read) => read?.error ? `Read failed: ${read.error.message ?? JSON.stringify(read.error)}` : read?.chain_id ?? 'Not recorded';
+const chainLabel = (id) => {
+    if (!id) return 'Not recorded';
+    const name = Object.values(chains).find((chain) => normalizeChainId(chain.chainId) === normalizeChainId(id))?.chainName;
+    return name ? `${name} (${id})` : id;
+};
+const readLabel = (read) => read?.error ? 'Read failed — see details' : chainLabel(read?.chain_id);
+const rpcLabel = (result) => {
+    const labels = { pending: 'Waiting', switch_response: 'Success', switch_cancelled: 'Rejected',
+        chain_not_added: 'Network not configured', switch_not_supported: 'Not supported',
+        switch_error: 'Error', error: 'Error', switch_not_sent: 'Not sent', switch_stopped_waiting: 'Stopped waiting' };
+    const code = result.error?.code ?? result.code;
+    return `${labels[result.status] ?? 'Not recorded'}${code != null ? ` (${code})` : ''}`;
+};
 const topicOf = (runtime) => (runtime.provider?.session ?? runtime.provider?.signer?.session)?.topic;
 const sameConnection = (a, b) => a.provider === b.provider && a.connectionTopic === topicOf(b) && a.address?.toLowerCase() === b.address?.toLowerCase();
 
@@ -80,6 +92,7 @@ export default function ChainSwitchCheck({ check, platform }) {
         } }, window.location.origin);
         const record = { ...base, step: `${index + 1}/${check.steps.length}:${channel}:${id}`,
             switch_attempt_id: id, started_at: new Date().toISOString(), channel,
+            ...(transport === 'walletconnect' ? { transaction_probe_limitation: 'Not sent: WalletConnect requires an explicit routing chain, which cannot verify the wallet active network.' } : {}),
             parameters: { ...base.parameters, requested_chain_id: target },
             switch_result: { chainId: target, status: 'pending' }, tester_observations: {}, verification_attempts: [] };
         connections.current.set(id, initial);
@@ -132,57 +145,37 @@ export default function ChainSwitchCheck({ check, platform }) {
         <p className="rounded-lg border border-[var(--wsr-note-border)] p-3 text-sm text-[var(--wsr-note-fg)]">Use a dedicated test wallet. Capture the switch prompt. For the later transaction request, capture the displayed network and cancel. Do not sign or send a transaction.</p>
         {check.steps.map((step, index) => <div key={step.id} className={card}>
             <h2 className="font-semibold">{index + 1}. Request {chains[step.data.params.switchTo].chainName}</h2>
-            <p className="text-sm">Record whether a confirmation appeared and how you responded. A successful RPC alone does not prove a network change.</p>
-            <label className="block space-y-1"><span>Target chain ID</span>
-                <input className={field} value={targets[index]} disabled={busy} onChange={(event) => setTargets((values) => values.map((value, i) => i === index ? event.target.value : value))} />
-            </label>
-            <p className="text-xs">For an unapproved-network retry, enter its chain ID. The dApp will not add networks or reconnect automatically.</p>
+            <details className="text-sm">
+                <summary>Change target network</summary>
+                <label className="mt-2 block space-y-1"><span>Target chain ID</span>
+                    <input className={field} value={targets[index]} disabled={busy} onChange={(event) => setTargets((values) => values.map((value, i) => i === index ? event.target.value : value))} />
+                </label>
+            </details>
             <CTAButton disabled={busy || !channel} onClick={() => run(index)}>Request network switch</CTAButton>
+            {records.at(-1)?.step.startsWith(`${index + 1}/`) && records.at(-1).switch_result.status !== 'pending' && <div className="space-y-2">
+                {usesWalletConnect(records.at(-1)) ? <p className="text-xs">Transaction inspection is unavailable through WalletConnect without choosing a network.</p> : <>
+                    <CTAButton disabled={busy} onClick={() => verify(records.at(-1))}>Inspect transaction network</CTAButton>
+                    <p className="text-xs">Capture the network shown by the wallet, then cancel the transaction request.</p>
+                </>}
+            </div>}
         </div>)}
         {busy && <CTAButton onClick={() => active.current?.abort()}>Stop waiting</CTAButton>}
         {busy && <p className="text-xs">Stopping the dApp wait does not cancel a wallet request. Cancel any open prompt before continuing.</p>}
         {records.length > 0 && <>
-            <div ref={summary} className="space-y-4" aria-live="polite">
-                {records.map((record) => <article key={record.switch_attempt_id} className={card}>
-                    <h2 className="font-semibold">{channels[record.channel]} · Target {record.switch_result.chainId}</h2>
-                    <p className="break-all text-xs">Attempt {record.switch_attempt_id} · {record.started_at}</p>
-                    <p className="text-sm">Before: {readLabel(record.switch_result.chain_before)}</p>
-                    <p className="text-sm">Switch RPC: {record.switch_result.status === 'switch_response' ? `Success (${JSON.stringify(record.switch_result.response ?? null)}) — network change not established by this response` : record.switch_result.status}</p>
-                    {record.switch_result.error && <p className="text-sm">Error: {record.switch_result.error.code ?? record.switch_result.code ?? 'No code'} · {record.switch_result.error.message}</p>}
-                    {record.switch_result.reason && <p className="text-sm">Not sent: {record.switch_result.reason}</p>}
-                    <p className="text-sm">After: {readLabel(record.switch_result.chain_after)}</p>
-                    {usesWalletConnect(record) && <p className="text-sm">WalletConnect reads describe the session provider, not a unique active wallet network. The follow-up transaction requires explicit chain routing and is unavailable as an active-network probe.</p>}
-                    {record.context_changed_during_request && <p>Connection changed during this attempt. Repeat with the same connection.</p>}
-                    <div data-capture-skip>
-                        <CTAButton disabled={busy || record.switch_result.status === 'pending'} onClick={() => verify(record)}>
-                            {usesWalletConnect(record) ? 'Record transaction probe limitation' : 'Inspect transaction network'}
-                        </CTAButton>
-                        <p className="text-xs">Zero-value self-transfer with no chain selected by the dApp. Capture the wallet network, then cancel. Transaction consent is not consent to switch networks.</p>
-                    </div>
-                    {record.verification_attempts.map((result, index) => <p key={index} className="text-sm">Transaction probe {index + 1}: {result.message}{result.context_changed ? ' Connection changed; repeat this attempt.' : ''}</p>)}
-                    <fieldset disabled={busy} className="space-y-3 text-sm" data-capture-skip>
-                        <Choice label="Did the wallet ask to confirm the network switch?" value={record.tester_observations.confirmation} onChange={(value) => observe(record, 'confirmation', value)} />
-                        <Choice label="How did you respond to the switch prompt?" options={['Accepted', 'Cancelled', 'No prompt', unknown]} value={record.tester_observations.switch_prompt_response} onChange={(value) => observe(record, 'switch_prompt_response', value)} />
-                        <label className="block">Network shown in the later transaction request
-                            <input className={field} value={record.tester_observations.displayed_network ?? ''} onChange={(event) => observe(record, 'displayed_network', event.target.value)} />
-                        </label>
-                        <Choice label="Was the target network preapproved?" options={['Preapproved', 'Not preapproved', unknown]} value={record.tester_observations.preapproved} onChange={(value) => observe(record, 'preapproved', value)} />
-                        <Choice label="Does the wallet let you manage preapproved networks?" value={record.tester_observations.preapproval_management} onChange={(value) => observe(record, 'preapproval_management', value)} />
-                        <label className="block">Capture references (file names or links)
-                            <textarea className={field} value={record.tester_observations.capture_references ?? ''} onChange={(event) => observe(record, 'capture_references', event.target.value)} />
-                        </label>
-                        <label className="block">Notes
-                            <textarea className={field} value={record.tester_observations.notes ?? ''} onChange={(event) => observe(record, 'notes', event.target.value)} />
-                        </label>
+            <div ref={summary} className={card} aria-live="polite">
+                <h2 className="font-semibold">Results · {channels[channel]}</h2>
+                {records.map((record, index) => <article key={record.switch_attempt_id} className="space-y-2 border-t border-[var(--wsr-border)] pt-3 text-sm">
+                    <h3 className="font-semibold">Attempt {index + 1} · {chainLabel(record.switch_result.chainId)}</h3>
+                    <p>Before: {readLabel(record.switch_result.chain_before)}</p>
+                    <p>After: {readLabel(record.switch_result.chain_after)}</p>
+                    <p>Switch RPC: {rpcLabel(record.switch_result)}</p>
+                    {usesWalletConnect(record) && <p className="text-xs">Session network only; the wallet’s active network is not verified.</p>}
+                    {record.context_changed_during_request && <p className="text-xs">Connection changed. Repeat this attempt.</p>}
+                    <fieldset disabled={busy} data-capture-skip>
+                        <Choice label="Did the wallet show a network-switch confirmation prompt?" value={record.tester_observations.confirmation} onChange={(value) => observe(record, 'confirmation', value)} />
                     </fieldset>
-                    {record.tester_observations.confirmation === 'No' && record.tester_observations.preapproval_management === 'Yes' && <p>Check the wallet’s approved networks, choose a network that is not approved and start a new attempt above. Keep this attempt for comparison.</p>}
-                    <dl className="space-y-1 text-xs">
-                        {Object.entries({ Confirmation: record.tester_observations.confirmation, 'Switch prompt response': record.tester_observations.switch_prompt_response,
-                            'Displayed network': record.tester_observations.displayed_network, 'Target preapproved': record.tester_observations.preapproved,
-                            'Preapproved-network management': record.tester_observations.preapproval_management,
-                            Captures: record.tester_observations.capture_references, Notes: record.tester_observations.notes }).map(([label, value]) => <div key={label}><dt>{label}</dt><dd className="whitespace-pre-wrap break-words">{value || 'Not recorded'}</dd></div>)}
-                    </dl>
-                    <p className="text-xs">No automatic verdict. Missing data, rejection and unsupported methods do not establish whether a confirmation appeared.</p>
+                    <p>Confirmation prompt: {record.tester_observations.confirmation || 'Not recorded'}</p>
+                    {record.verification_attempts.length > 0 && <p>Transaction probe: {record.verification_attempts.at(-1).status === 'cancelled' ? 'Cancelled' : record.verification_attempts.at(-1).status === 'response' ? 'Response received' : record.verification_attempts.at(-1).status.replaceAll('_', ' ')}</p>}
                 </article>)}
             </div>
             <ResultExportActions onCopyEvidence={copy} onCopyImage={copyImage} />

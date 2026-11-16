@@ -82,17 +82,23 @@ for (const platform of ['extension', 'mobile']) test(`${platform} follows navbar
     assert.doesNotMatch(markup, /Test channel|Select the channel|Connect selected channel/);
     assert.equal(nodes(f.render()).filter((node) => node.type === 'select').length, 0);
     await f.click('Request network switch');
-    await f.click(platform === 'mobile' ? 'Record transaction probe limitation' : 'Inspect transaction network');
+    if (platform === 'extension') await f.click('Inspect transaction network');
     f.observations()[0].props.onChange('No');
-    f.observations()[3].props.onChange('Yes');
-    assert.match(renderToStaticMarkup(f.render()), /choose a network that is not approved/);
+    assert.equal(f.observations().length, 1);
+    const resultMarkup = renderToStaticMarkup(f.render());
+    assert.doesNotMatch(resultMarkup, /How did you respond|Was the target network preapproved|Capture references|<textarea/);
+    assert.match(resultMarkup, /Before:.*Polygon/);
+    assert.match(resultMarkup, /Confirmation prompt:.*No/);
     const first = (await f.exported())[0];
     assert.equal(first.channel, platform);
     assert.equal(first.runtime.platform, platform);
     assert.equal(first.runtime.channel_source, 'navbar');
     assert.equal(first.runtime.transport, platform === 'mobile' ? 'walletconnect' : 'extension');
     assert.equal(first.switch_result.chain_after.chain_id, platform === 'mobile' ? '0x89' : '0x1');
-    assert.equal(first.verification_attempts[0].status, platform === 'mobile' ? 'unavailable' : 'cancelled');
+    if (platform === 'mobile') {
+        assert.equal(first.verification_attempts.length, 0);
+        assert.match(first.transaction_probe_limitation, /explicit routing chain/);
+    } else assert.equal(first.verification_attempts[0].status, 'cancelled');
     assert.equal(first.tester_observations.confirmation, 'No');
     assert.equal(first.automatic_verdict, null);
     await f.click('Request network switch', 1);
