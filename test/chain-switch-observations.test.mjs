@@ -41,7 +41,7 @@ for (const failed of ['before', 'after', 'both']) test(`failed ${failed} read is
     }
 });
 
-function fixture({ initial = [], pending = false } = {}) {
+function fixture({ initial = [], pending = false, platform = 'extension' } = {}) {
     const hooks = reactHarness(), calls = [], saved = new Map(), copied = [];
     const reply = deferred(); let selected = '0x89';
     const provider = { request: async (request) => {
@@ -66,45 +66,47 @@ function fixture({ initial = [], pending = false } = {}) {
     }, { window: { location: { origin: 'https://example.test' } }, navigator: { clipboard: { writeText: async (value) => copied.push(JSON.parse(value)) } } });
     const check = load('src/app/wizard/config/wizard.json').wizard.checks['WSR-PERM-009'];
     const Component = load('src/app/wizard/components/ChainSwitchCheck.jsx').default;
-    const render = () => hooks.render(Component, { check, platform: 'mobile' });
-    const select = (value) => nodes(render()).find((node) => node.type === 'select').props.onChange({ target: { value } });
+    const render = () => hooks.render(Component, { check, platform });
     const click = (label, index = 0) => {
         const button = nodes(render()).filter((node) => node.props.onClick && node.props.children === label)[index];
         assert(button, label); assert(!button.props.disabled, label); return button.props.onClick();
     };
     const observations = () => nodes(render()).filter((node) => typeof node.type === 'function' && node.type.name === 'Choice');
     const exported = async () => { await nodes(render()).find((node) => node.props.onCopyEvidence).props.onCopyEvidence(); return copied.at(-1); };
-    return { render, select, click, calls, saved, exported, observations, injected, reply, hooks };
+    return { render, click, calls, saved, exported, observations, injected, reply, hooks };
 }
 
-test('mobile campaign uses the selected injected channel, records observations and exports separate attempts', async () => {
-    const f = fixture(); f.select('embedded');
+for (const platform of ['extension', 'mobile']) test(`${platform} follows navbar without another platform or connection control`, async () => {
+    const f = fixture({ platform });
+    const markup = renderToStaticMarkup(f.render());
+    assert.doesNotMatch(markup, /Test channel|Select the channel|Connect selected channel/);
+    assert.equal(nodes(f.render()).filter((node) => node.type === 'select').length, 0);
     await f.click('Request network switch');
-    await f.click('Inspect transaction network');
+    await f.click(platform === 'mobile' ? 'Record transaction probe limitation' : 'Inspect transaction network');
     f.observations()[0].props.onChange('No');
     f.observations()[3].props.onChange('Yes');
     assert.match(renderToStaticMarkup(f.render()), /choose a network that is not approved/);
     const first = (await f.exported())[0];
-    assert.equal(first.channel, 'embedded');
-    assert.equal(first.runtime.platform, 'mobile');
-    assert.equal(first.switch_result.chain_after.chain_id, '0x1');
-    assert.equal(first.verification_attempts[0].status, 'cancelled');
+    assert.equal(first.channel, platform);
+    assert.equal(first.runtime.platform, platform);
+    assert.equal(first.runtime.channel_source, 'navbar');
+    assert.equal(first.runtime.transport, platform === 'mobile' ? 'walletconnect' : 'extension');
+    assert.equal(first.switch_result.chain_after.chain_id, platform === 'mobile' ? '0x89' : '0x1');
+    assert.equal(first.verification_attempts[0].status, platform === 'mobile' ? 'unavailable' : 'cancelled');
     assert.equal(first.tester_observations.confirmation, 'No');
     assert.equal(first.automatic_verdict, null);
-    f.select('extension'); await f.click('Request network switch', 1);
-    f.select('walletconnect'); await f.click('Request network switch');
-    await f.click('Record transaction probe limitation');
+    await f.click('Request network switch', 1);
     const result = await f.exported();
-    assert.equal(result.length, 3); assert.equal(f.saved.size, 3);
+    assert.equal(result.length, 2); assert.equal(f.saved.size, 2);
     assert.deepEqual(result[0], first);
-    assert.deepEqual(result.map((record) => record.channel), ['embedded', 'extension', 'walletconnect']);
-    assert.equal(result[2].verification_attempts[0].status, 'unavailable');
-    assert.equal(new Set(result.map((record) => record.step)).size, 3);
+    assert.equal(new Set(result.map((record) => record.step)).size, 2);
     assert(f.calls.every((request) => !['wallet_addEthereumChain', 'eth_signTypedData_v4'].includes(request.method)));
+    if (platform === 'mobile') assert(f.calls.every((request) => request.chainId === 'eip155:137'));
+    else assert(f.calls.every((request) => request.method));
 });
 
 test('stopping a pending attempt preserves it and late settlement cannot overwrite a newer attempt', async () => {
-    const f = fixture({ pending: true }); f.select('extension');
+    const f = fixture({ pending: true });
     const first = f.click('Request network switch'); await flush();
     await f.click('Stop waiting'); await first;
     const original = structuredClone([...f.saved.values()][0]);
@@ -116,19 +118,19 @@ test('stopping a pending attempt preserves it and late settlement cannot overwri
 });
 
 test('connection changes and restored evidence cannot silently route follow-up requests', async () => {
-    const f = fixture(); f.select('extension'); await f.click('Request network switch');
+    const f = fixture(); await f.click('Request network switch');
     const records = await f.exported(); const before = f.calls.length;
     f.injected.address = `0x${'34'.repeat(20)}`;
     await f.click('Inspect transaction network');
     assert.equal(f.calls.length, before);
-    const restored = fixture({ initial: records }); restored.select('extension');
+    const restored = fixture({ initial: records });
     await restored.click('Inspect transaction network');
     assert.equal(restored.calls.length, 0);
     assert.deepEqual(await restored.exported(), records);
 });
 
 test('unmount stops the wait and retains the attempt without dispatching a later request', async () => {
-    const f = fixture({ pending: true }); f.select('extension');
+    const f = fixture({ pending: true });
     const run = f.click('Request network switch'); await flush(); f.hooks.unmount(); await run;
     const calls = f.calls.length;
     f.reply.resolve(null); await flush();

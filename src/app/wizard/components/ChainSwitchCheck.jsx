@@ -12,9 +12,10 @@ import { chains } from '@/utils/constants';
 import { normalizeChainId } from '@/utils/wallet-methods/chainId.mjs';
 import { requestChainSwitch } from '@/utils/wallet-methods/chainSwitchProbe.mjs';
 import { requestChainVerification } from '@/utils/wallet-methods/chainSwitchVerification.mjs';
-import { REQUEST_WAIT_STOPPED, waitForWalletReply } from '@/utils/wallet-methods/requestWait.mjs';
+import { resolveTransport } from '../utils/platform';
 
-const channels = { embedded: 'Wallet embedded browser', extension: 'Browser extension', walletconnect: 'WalletConnect' };
+const channels = { mobile: 'Mobile', extension: 'Extension', embedded: 'Wallet embedded browser', walletconnect: 'WalletConnect' };
+const usesWalletConnect = (record) => record.runtime?.transport === 'walletconnect' || record.channel === 'walletconnect';
 const unknown = 'Not determined';
 const field = 'w-full rounded border border-[var(--wsr-border)] bg-[var(--wsr-bg)] p-2 text-sm';
 const card = 'space-y-3 rounded-lg border border-[var(--wsr-border)] bg-[var(--wsr-card)] p-4';
@@ -32,10 +33,9 @@ function Choice({ label, value, onChange, options = ['Yes', 'No', unknown] }) {
 }
 
 export default function ChainSwitchCheck({ check, platform }) {
-    const injected = useWalletRuntime('extension');
-    const walletConnect = useWalletRuntime('walletconnect');
-    const [channel, setChannel] = useState('');
-    const runtime = channel === 'walletconnect' ? walletConnect : injected;
+    const channel = platform;
+    const transport = resolveTransport(platform, check.steps[0]);
+    const runtime = useWalletRuntime(transport);
     const latest = useRef(runtime); latest.current = runtime;
     const [records, setRecords] = useState(() => loadCheckEvidence(check.canonicalId, platform)
         .map((record) => record.evidence).filter((record) => record.switch_attempt_id));
@@ -63,31 +63,19 @@ export default function ChainSwitchCheck({ check, platform }) {
         const record = recordsRef.current.find((item) => item.switch_attempt_id === id);
         if (record) save({ ...record, ...changes });
     };
-    const connect = async () => {
-        if (active.current) return;
-        const controller = new AbortController(); active.current = controller; setBusy(true);
-        try {
-            if (channel === 'walletconnect') await runtime.open?.({ view: 'Connect', namespace: 'eip155' });
-            else if (runtime.provider?.request) {
-                await waitForWalletReply(() => runtime.provider.request({ method: 'eth_requestAccounts' }), controller.signal);
-                await runtime.refresh?.();
-            } else setNotice('Open this page in the wallet browser or enable its browser extension.');
-        } catch (error) { if (alive.current) setNotice(error === REQUEST_WAIT_STOPPED ? 'Stopped waiting. Cancel any open wallet prompt.' : String(error?.message ?? error)); }
-        finally { active.current = null; if (alive.current) setBusy(false); }
-    };
     const run = async (index) => {
         if (active.current || !channel) return;
         const target = normalizeChainId(targets[index]);
         if (!target || target === '0x0') { setNotice('Enter a valid target chain ID.'); return; }
         const initial = { ...latest.current, connectionTopic: topicOf(latest.current) };
-        if (!initial.provider?.request || !initial.address) { setNotice('Connect the selected channel before starting.'); return; }
+        if (!initial.provider?.request || !initial.address) { setNotice('Connect your wallet using Connect Wallet in the navbar.'); return; }
         if (initial.networkSetup?.busy) { setNotice('Wait for connection setup to finish before starting a switch attempt.'); return; }
         const controller = new AbortController(); active.current = controller; setBusy(true); setNotice('');
         const id = crypto.randomUUID();
         const resolved = resolveCheckParams(check.steps[index]);
         const base = comparisonEvidence(resolved, { runtime: {
-            platform, transport: channel === 'walletconnect' ? 'walletconnect' : 'injected',
-            channel, channel_source: 'tester_selected', from: initial.address,
+            platform, transport: transport,
+            channel, channel_source: 'navbar', from: initial.address,
             chain_id: initial.chainId, session_topic: topicOf(initial) ?? null,
         } }, window.location.origin);
         const record = { ...base, step: `${index + 1}/${check.steps.length}:${channel}:${id}`,
@@ -98,7 +86,7 @@ export default function ChainSwitchCheck({ check, platform }) {
         save(record);
         try {
             const result = await requestChainSwitch({ provider: initial.provider, chainId: target,
-                transport: channel === 'walletconnect' ? 'walletconnect' : 'extension',
+                transport: transport,
                 requirePolygon: false, signal: controller.signal });
             update(id, { switch_result: result, wallet_output: result,
                 context_changed_during_request: !sameConnection(initial, latest.current) });
@@ -115,7 +103,7 @@ export default function ChainSwitchCheck({ check, platform }) {
         const controller = new AbortController(); active.current = controller; setBusy(true); setNotice('');
         try {
             const result = await requestChainVerification({ provider: initial.provider, address: initial.address,
-                chainId: record.switch_result.chainId, transport: record.channel === 'walletconnect' ? 'walletconnect' : 'extension',
+                chainId: record.switch_result.chainId, transport: record.runtime.transport,
                 signal: controller.signal });
             const current = recordsRef.current.find((item) => item.switch_attempt_id === record.switch_attempt_id);
             update(record.switch_attempt_id, { verification_attempts: [...current.verification_attempts, {
@@ -142,17 +130,6 @@ export default function ChainSwitchCheck({ check, platform }) {
         <WizardStepHeader checkId={check.canonicalId} title={checkTitle(check.steps[0])} contained={false} wrapTitle />
         <p>Compare the provider network before and after each switch with the network displayed by the wallet.</p>
         <p className="rounded-lg border border-[var(--wsr-note-border)] p-3 text-sm text-[var(--wsr-note-fg)]">Use a dedicated test wallet. Capture the switch prompt. For the later transaction request, capture the displayed network and cancel. Do not sign or send a transaction.</p>
-        <div className={card}>
-            <label className="block space-y-1"><span>Test channel</span>
-                <select className={field} value={channel} disabled={busy} onChange={(event) => setChannel(event.target.value)}>
-                    <option value="">Select the channel you are using</option>
-                    {Object.entries(channels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                </select>
-            </label>
-            <p className="text-sm">The provider cannot reliably distinguish an embedded browser from an extension. Select the actual channel; attempts are saved separately.</p>
-            <CTAButton disabled={busy || !channel} onClick={connect}>Connect selected channel</CTAButton>
-            {runtime.address && channel && <p className="break-all text-xs">Account: {runtime.address}</p>}
-        </div>
         {check.steps.map((step, index) => <div key={step.id} className={card}>
             <h2 className="font-semibold">{index + 1}. Request {chains[step.data.params.switchTo].chainName}</h2>
             <p className="text-sm">Record whether a confirmation appeared and how you responded. A successful RPC alone does not prove a network change.</p>
@@ -174,11 +151,11 @@ export default function ChainSwitchCheck({ check, platform }) {
                     {record.switch_result.error && <p className="text-sm">Error: {record.switch_result.error.code ?? record.switch_result.code ?? 'No code'} · {record.switch_result.error.message}</p>}
                     {record.switch_result.reason && <p className="text-sm">Not sent: {record.switch_result.reason}</p>}
                     <p className="text-sm">After: {readLabel(record.switch_result.chain_after)}</p>
-                    {record.channel === 'walletconnect' && <p className="text-sm">WalletConnect reads describe the session provider, not a unique active wallet network. The follow-up transaction requires explicit chain routing and is unavailable as an active-network probe.</p>}
+                    {usesWalletConnect(record) && <p className="text-sm">WalletConnect reads describe the session provider, not a unique active wallet network. The follow-up transaction requires explicit chain routing and is unavailable as an active-network probe.</p>}
                     {record.context_changed_during_request && <p>Connection changed during this attempt. Repeat with the same connection.</p>}
                     <div data-capture-skip>
                         <CTAButton disabled={busy || record.switch_result.status === 'pending'} onClick={() => verify(record)}>
-                            {record.channel === 'walletconnect' ? 'Record transaction probe limitation' : 'Inspect transaction network'}
+                            {usesWalletConnect(record) ? 'Record transaction probe limitation' : 'Inspect transaction network'}
                         </CTAButton>
                         <p className="text-xs">Zero-value self-transfer with no chain selected by the dApp. Capture the wallet network, then cancel. Transaction consent is not consent to switch networks.</p>
                     </div>
