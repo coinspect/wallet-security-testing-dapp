@@ -51,7 +51,7 @@ const WalletRuntimeContext = createContext(null);
  * session. Consumers select a transport; they never start a second account or
  * chain subscription of their own.
  */
-export function WalletRuntimeProvider({ children }) {
+export function WalletRuntimeProvider({ children, preserveNetwork = false }) {
     const mounted = useRef(true);
     useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
     const injectedProvider = useActiveProvider();
@@ -252,13 +252,14 @@ export function WalletRuntimeProvider({ children }) {
     // events. A chain-switch test must retain its actual result without an
     // automatic switch-back or a second wallet prompt contaminating evidence.
     useEffect(() => {
+        if (preserveNetwork) return;
         if (!walletProvider || !topic) { polygonSetup.current = null; setNetworkSetup({ busy: false, error: null }); return; }
         if (walletConnectRpc.provider !== walletProvider || walletConnectRpc.topic !== topic || !walletConnectRpc.chainId) return;
         if (polygonSetup.current?.provider === walletProvider && polygonSetup.current.topic === topic) return;
         polygonSetup.current = { provider: walletProvider, topic };
         setNetworkSetup({ busy: false, error: null });
         if (walletConnectRpc.chainId !== POLYGON_CHAIN_ID) switchWalletConnectToPolygon().catch(() => {});
-    }, [walletProvider, topic, walletConnectRpc, switchWalletConnectToPolygon]);
+    }, [walletProvider, topic, walletConnectRpc, switchWalletConnectToPolygon, preserveNetwork]);
 
     const switchInjectedToPolygon = useCallback(async () => {
         if (!injectedProvider?.request || selectedInjected.current !== injectedProvider) return;

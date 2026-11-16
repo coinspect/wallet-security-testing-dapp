@@ -8,10 +8,10 @@ import { AppKitProvider } from './AppKitProvider';
  * Application providers persist across route changes. Wallet state lives here once;
  * campaign-specific Sentinel state is mounted inside the wizard layout.
  */
-export default function AppProviders({ children }) {
+export default function AppProviders({ children, preserveWalletNetwork = false }) {
   return (
     <AppKitProvider>
-      <WalletRuntimeProvider>
+      <WalletRuntimeProvider preserveNetwork={preserveWalletNetwork}>
         <ThemeProvider>{children}</ThemeProvider>
       </WalletRuntimeProvider>
     </AppKitProvider>

@@ -1,37 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { ethers } from 'ethers';
-import { networkVerificationData, requestChainVerification } from '../src/utils/wallet-methods/chainSwitchVerification.mjs';
+import { requestChainVerification } from '../src/utils/wallet-methods/chainSwitchVerification.mjs';
 
 const address = `0x${'12'.repeat(20)}`;
-for (const chainId of ['0x1', '0x144']) {
-    test(`valid diagnostic EIP-712 payload for ${chainId}`, () => {
-        const data = networkVerificationData(chainId);
-        assert.equal(data.domain.chainId, Number(BigInt(chainId)));
-        assert.equal(data.primaryType, 'NetworkVerification');
-        assert.equal(data.domain.verifyingContract, undefined);
-        assert.match(ethers.utils._TypedDataEncoder.hash(data.domain, { NetworkVerification: data.types.NetworkVerification }, data.message), /^0x[0-9a-f]{64}$/);
-    });
-    for (const transport of ['extension', 'walletconnect']) {
-        test(`${transport} targets ${chainId} without switching, preflight or method filters`, async () => {
-            const calls = [];
-            const send = async (request) => { calls.push(request); throw { code: 4001, message: 'User rejected' }; };
-            const provider = { request: send, session: { topic: 'test', namespaces: {} }, client: { request: send } };
-            const result = await requestChainVerification({ provider, address, chainId, transport });
-            assert.equal(calls.length, 1);
-            const request = transport === 'walletconnect' ? calls[0].request : calls[0];
-            assert.equal(request.method, 'eth_signTypedData_v4');
-            assert.equal(request.params[0], address);
-            assert.equal(JSON.parse(request.params[1]).domain.chainId, Number(BigInt(chainId)));
-            assert.equal(result.routing_chain_id, transport === 'walletconnect' ? `eip155:${BigInt(chainId)}` : null);
-            if (transport === 'walletconnect') assert.equal(calls[0].chainId, result.routing_chain_id);
-            assert.equal(result.status, 'cancelled');
-            assert.equal(result.request_submitted, true);
-            assert.equal(result.automatic_verdict, null);
-        });
-    }
-}
-
+test('transaction inspection sends no selected chain and never switches or reconnects', async () => {
+    const calls = [];
+    const provider = { request: async (request) => { calls.push(request); throw { code: 4001, message: 'User rejected' }; } };
+    const result = await requestChainVerification({ provider, address, chainId: '0x144', transport: 'extension' });
+    assert.deepEqual(calls, [{ method: 'eth_sendTransaction', params: [{ from: address, to: address, value: '0x0', data: '0x' }] }]);
+    assert.equal(result.routing_chain_id, null);
+    assert.equal(result.status, 'cancelled');
+    assert.equal(result.request_submitted, true);
+    assert.equal(result.automatic_verdict, null);
+});
+test('WalletConnect records a limitation without sending any request', async () => {
+    const provider = { request: () => assert.fail('No request'), client: { request: () => assert.fail('No routing') } };
+    const result = await requestChainVerification({ provider, address, chainId: '0x1', transport: 'walletconnect' });
+    assert.equal(result.status, 'unavailable');
+    assert.equal(result.request_submitted, false);
+    assert.equal(result.routing_chain_id, null);
+    assert.match(result.message, /explicit routing chain/);
+});
 test('stop and timeout preserve the submitted request and ignore late responses', async () => {
     for (const stop of [true, false]) {
         let finish;
@@ -48,12 +37,11 @@ test('stop and timeout preserve the submitted request and ignore late responses'
         assert.equal(result.wallet_output, undefined);
     }
 });
-
-test('missing connection, abort before dispatch and RPC errors remain distinct', async () => {
+test('connection failure, stop before dispatch and RPC errors remain distinct', async () => {
     const base = { address, chainId: '0x1' };
     assert.equal((await requestChainVerification(base)).status, 'not_sent');
     const controller = new AbortController(); controller.abort();
-    const provider = { request: () => { throw new Error('must not send'); } };
+    const provider = { request: () => assert.fail('must not send') };
     const stopped = await requestChainVerification({ ...base, provider, signal: controller.signal });
     assert.equal(stopped.status, 'stopped');
     assert.equal(stopped.request_submitted, false);
@@ -61,10 +49,9 @@ test('missing connection, abort before dispatch and RPC errors remain distinct',
     assert.equal(result.status, 'error');
     assert.deepEqual(result.rpc_error, { code: 4200, message: 'Unsupported method' });
 });
-
-test('a response does not establish that the previous switch succeeded', async () => {
+test('transaction response does not establish consent to a switch', async () => {
     const result = await requestChainVerification({ provider: { request: async () => '0xresponse' }, address, chainId: '0x1' });
     assert.equal(result.automatic_verdict, null);
-    assert.match(result.message, /Network change not confirmed/);
+    assert.match(result.message, /does not establish consent/);
     assert.equal(result.wallet_output, '0xresponse');
 });

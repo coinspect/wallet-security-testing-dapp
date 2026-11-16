@@ -18,22 +18,36 @@ function wallet() {
 }
 function mount() {
     const harness = reactHarness(), store = new Map();
-    const state = { injected: null, wc: null };
+    const state = { injected: null, wc: null, preserveNetwork: false };
+    const setupCalls = [];
     const events = { addEventListener() {}, removeEventListener() {} };
     const Provider = sourceLoader({
         react: harness.react,
         "../utils/selectedProvider": { useActiveProvider: () => state.injected },
         "@/utils/walletConnection": { WALLET_ACCOUNTS_EVENT: "test-accounts" },
         // Network setup is tested separately; keep these focused on read races.
-        "@/utils/wallet-methods/chain": { ensurePolygon: () => new Promise(() => {}) },
+        "@/utils/wallet-methods/chain": { ensurePolygon: (provider) => { setupCalls.push(provider); return new Promise(() => {}); } },
         "@reown/appkit/react": {
             useAppKit: () => ({ open() {} }), useAppKitAccount: () => ({}), useAppKitNetwork: () => ({}),
             useAppKitProvider: () => ({ walletProvider: state.wc }),
             useDisconnect: () => ({ disconnect() {} }),
         },
     }, { window: { ...events, localStorage: { setItem: (key, value) => store.set(key, value) } }, document: events })("src/app/wizard/context/WalletRuntimeContext.jsx").WalletRuntimeProvider;
-    return { state, store, render: () => harness.render(Provider, {}).props.value, unmount: harness.unmount };
+    return { state, store, setupCalls, render: () => harness.render(Provider, { preserveNetwork: state.preserveNetwork }).props.value, unmount: harness.unmount };
 }
+
+test('switch observations suppress automatic Polygon setup only while preserving the network', async () => {
+    const ui = mount(), provider = wallet();
+    ui.state.preserveNetwork = true; ui.state.wc = provider;
+    ui.render(); await flush(); provider.settle(A, '0x1'); await flush();
+    assert.equal(ui.render().walletConnect.chainId, '0x1');
+    assert.equal(ui.setupCalls.length, 0);
+    provider.emit('chainChanged', '0x144'); ui.render();
+    assert.equal(ui.setupCalls.length, 0);
+    ui.state.preserveNetwork = false; ui.render();
+    assert.equal(ui.setupCalls.length, 1);
+    ui.unmount();
+});
 
 for (const [transport, key] of [["injected", "injected"], ["wc", "walletConnect"]]) {
     test(`${transport}: an old wallet read cannot populate the newly selected provider`, async () => {

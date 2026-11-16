@@ -1,18 +1,7 @@
 import { normalizeChainId } from './chainId.mjs';
 import { REQUEST_WAIT_STOPPED, waitForWalletReply } from './requestWait.mjs';
 import { isUserCancellation } from './walletErrors.mjs';
-
-export function networkVerificationData(chainId) {
-    return {
-        types: {
-            EIP712Domain: [{ name: 'name', type: 'string' }, { name: 'version', type: 'string' }, { name: 'chainId', type: 'uint256' }],
-            NetworkVerification: [{ name: 'message', type: 'string' }],
-        },
-        primaryType: 'NetworkVerification',
-        domain: { name: 'Wallet network verification', version: '1', chainId: Number(BigInt(chainId)) },
-        message: { message: 'Network display test. Cancel this request.' },
-    };
-}
+import { simpleTransaction } from './simpleTransaction.mjs';
 
 export async function requestChainVerification({ provider, address, chainId, transport, signal, timeoutMs = 30000 }) {
     const mobile = transport === 'walletconnect';
@@ -28,25 +17,19 @@ export async function requestChainVerification({ provider, address, chainId, tra
     if (signal?.aborted) stop();
     const timer = setTimeout(() => controller.abort('timeout'), timeoutMs);
     try {
-        const request = { method: 'eth_signTypedData_v4', params: [address, JSON.stringify(networkVerificationData(chainId))] };
+        const request = { method: 'eth_sendTransaction', params: [simpleTransaction(address, address)] };
         result.request = request;
         let send;
         if (mobile) {
-            const universal = provider.client ? provider : provider.signer;
-            const session = provider.session ?? universal?.session;
-            if (!session?.topic || !universal?.client?.request) {
-                return { ...result, status: 'not_sent', message: 'WalletConnect connection unavailable.' };
-            }
-            result.session_topic = session.topic;
-            result.routing_chain_id = `eip155:${BigInt(chainId)}`;
-            send = () => universal.client.request({ topic: session.topic, chainId: result.routing_chain_id, request });
+            return { ...result, status: 'unavailable', routing_chain_id: null,
+                message: 'Not sent: WalletConnect requires an explicit routing chain. That selection cannot prove the wallet switched its active network.' };
         } else {
             if (!provider.request) return { ...result, status: 'not_sent', message: 'Wallet provider unavailable.' };
             result.routing_chain_id = null;
             send = () => provider.request(request);
         }
         const response = await waitForWalletReply(() => { result.request_submitted = true; return send(); }, controller.signal);
-        return { ...result, status: 'response', wallet_output: response ?? null, message: 'Signing response received. Network change not confirmed.' };
+        return { ...result, status: 'response', wallet_output: response ?? null, message: 'Transaction response received. Review the wallet screenshot; this does not establish consent to the network switch.' };
     } catch (error) {
         if (error === REQUEST_WAIT_STOPPED) return { ...result,
             status: controller.signal.reason === 'timeout' ? 'timeout' : 'stopped',

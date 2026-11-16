@@ -27,7 +27,7 @@ export default function App() {
     const { pathname } = useLocation();
     useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
     return (
-        <AppProviders>
+        <AppProviders preserveWalletNetwork={canonicalCheckBase(pathname.split('/').filter(Boolean).at(-1)) === 'WSR-PERM-009'}>
             <main className="min-h-screen overflow-x-hidden bg-stealth-bg">
                 <Routes>
                     <Route path="/" element={<Navigate to="/wizard" replace />} />
